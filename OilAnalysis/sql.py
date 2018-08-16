@@ -1,7 +1,5 @@
-from sqlalchemy import create_engine
 import sqlalchemy.engine
-
-local_engine = create_engine("mysql+pymysql://root@localhost:3306/oil_analysis")
+from OilAnalysis.settings import local_engine
 
 __type_map = {int: "int", float: "float", str: "text"}
 
