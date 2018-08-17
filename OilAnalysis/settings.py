@@ -65,9 +65,9 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'OilAnalysis.pipelines.OilanalysisPipeline': 300,
-# }
+ITEM_PIPELINES = {
+	'OilAnalysis.pipelines.OilNewsPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -94,5 +94,6 @@ ROBOTSTXT_OBEY = True
 # Below starts my custom settings
 ####################
 
-oil_news_table_name = "oil_news"
-local_engine = create_engine("mysql+pymysql://root@localhost:3306/oil_analysis")
+__local_engine = create_engine("mysql+pymysql://root@localhost:3306/oil_analysis")
+
+engine = __local_engine
