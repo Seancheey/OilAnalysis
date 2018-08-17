@@ -1,7 +1,8 @@
 import sqlalchemy.engine
 from OilAnalysis.settings import engine
+from datetime import datetime
 
-__type_map = {int: "int", float: "float", str: "text"}
+__type_map = {int: "int", float: "float", str: "text", datetime: "date"}
 
 
 def insert_values(engine_or_connection, table_name: str, entries):
@@ -26,7 +27,9 @@ def gen_create_query(table_name, column_types: dict, column_suffix: dict = None)
 
 def gen_insert_query(table_name: str, values: dict):
 	columns = ",".join(values.keys())
-	col_values = ",".join([str(value) if type(value) != str else "'%s'" % value for value in values.values()])
+	col_values = ",".join(
+		[str(value) if type(value) not in [datetime, str] else "'%s'" % value for value in values.values()]
+	)
 	return "INSERT INTO %s(%s) VALUES (%s);" % (table_name, columns, col_values)
 
 
