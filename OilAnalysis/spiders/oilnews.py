@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from OilAnalysis.oilnews_settings import *
+from OilAnalysis.runspider import run
 
 
 class OilNewsSpider(scrapy.Spider):
@@ -29,3 +30,7 @@ class OilNewsSpider(scrapy.Spider):
 			col_author: author,
 			col_content: content
 		}
+
+
+if __name__ == "__main__":
+	run(OilNewsSpider)
