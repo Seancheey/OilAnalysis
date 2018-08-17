@@ -9,9 +9,13 @@ class OilNewsSpider(scrapy.Spider):
 	start_urls = ['https://oilprice.com/Latest-Energy-News/World-News/']
 
 	def parse(self, response):
+		# get all news in the current page
 		for article in response.css('div.categoryArticle'):
 			news_url = article.css('a::attr("href")').extract_first()
 			yield response.follow(news_url, self.parse_news_content)
+		# go to next page
+		next_url = response.css('div.pagination a.next::attr("href")').extract_first()
+		yield response.follow(next_url, self.parse)
 
 	def parse_news_content(self, response):
 		news = response.css("div.singleArticle__content")
