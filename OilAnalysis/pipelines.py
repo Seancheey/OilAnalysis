@@ -56,7 +56,7 @@ class OilNewsPipeline(SQLExportPipeline):
 		# format publish_time to standard datetime before insert
 		date_str: str = item[col_news_date]
 		date_str = date_str.replace("CDT", "CST")
-		item[col_news_date] = datetime.strptime(date_str, "%b %d, %Y, %I:%M %p %Z")
+		item[col_news_date] = datetime.strptime(date_str, "%b %d, %Y, %I:%M %p %Z").isoformat()
 		return item
 
 
