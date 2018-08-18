@@ -62,7 +62,7 @@ oil_daily_price_settings = SQLSettings(
 		col_price_update_time: "TIMESTAMP"
 	},
 	column_suffix={
-		col_price_id: "primary key",
+		col_price_id: "primary key AUTO_INCREMENT",
 		col_price_index_name: "not null",
 		col_price_last: "not null",
 		col_price_category: "null",
