@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from OilAnalysis.oilnews_settings import *
 from OilAnalysis.runspider import run
+from OilAnalysis.sqlsettings import *
 
 
 class OilNewsSpider(scrapy.Spider):
@@ -25,10 +25,10 @@ class OilNewsSpider(scrapy.Spider):
 		date = news.css("span.article_byline::text").extract()[1][3:]
 		content = "\n".join(response.css('div#news-content p::text').extract())
 		yield {
-			col_title: title,
-			col_date: date,
-			col_author: author,
-			col_content: content
+			col_news_title: title,
+			col_news_date: date,
+			col_news_author: author,
+			col_news_content: content
 		}
 
 

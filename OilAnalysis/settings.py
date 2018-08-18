@@ -67,6 +67,7 @@ ROBOTSTXT_OBEY = True
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
 	'OilAnalysis.pipelines.OilNewsPipeline': 300,
+	'OilAnalysis.pipelines.OilDailyPricePipeline': 301,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

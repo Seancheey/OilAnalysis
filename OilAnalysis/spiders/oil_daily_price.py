@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from OilAnalysis.oil_daily_price_settings import *
+from OilAnalysis.sqlsettings import *
 
 
 class OilDailyPriceSpider(scrapy.Spider):
@@ -24,10 +24,11 @@ class OilDailyPriceSpider(scrapy.Spider):
 					continue
 
 				yield {
-					col_category: table_name,
-					col_index_name: row.css('td::text').extract_first(),
-					col_last: row.css('td.last_price::text').extract_first(),
-					col_abs_change: row.css('td.change_up::text,td.change_down::text').extract_first(),
-					col_per_change: row.css('td.change_up_percent::text,td.change_down_percent::text').extract_first(),
-					col_update_time: time
+					col_price_category: table_name,
+					col_price_index_name: row.css('td::text').extract_first(),
+					col_price_last: row.css('td.last_price::text').extract_first(),
+					col_price_abs_change: row.css('td.change_up::text,td.change_down::text').extract_first(),
+					col_price_per_change: row.css(
+						'td.change_up_percent::text,td.change_down_percent::text').extract_first(),
+					col_price_update_time: time
 				}
