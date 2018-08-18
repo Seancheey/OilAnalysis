@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from OilAnalysis.sqlsettings import *
+from datetime import datetime, timedelta
 
 
 class OilDailyPriceSpider(scrapy.Spider):
@@ -22,13 +23,54 @@ class OilDailyPriceSpider(scrapy.Spider):
 				# if time is not get, it's more like a subtitle table row, so skip it
 				if not time:
 					continue
-
+				# convert time to iso format
+				time = self.convert_time(time)
+				# convert string like "+2.0%" to float
+				percent_change = row.css('td.change_up_percent::text,td.change_down_percent::text').extract_first()
+				percent_change = float(percent_change[:-1])
+				# convert string to float
+				abs_change = float(row.css('td.change_up::text,td.change_down::text').extract_first())
+				last_price = float(row.css('td.last_price::text').extract_first())
 				yield {
 					col_price_category: table_name,
 					col_price_index_name: row.css('td::text').extract_first(),
-					col_price_last: row.css('td.last_price::text').extract_first(),
-					col_price_abs_change: row.css('td.change_up::text,td.change_down::text').extract_first(),
-					col_price_per_change: row.css(
-						'td.change_up_percent::text,td.change_down_percent::text').extract_first(),
+					col_price_last: last_price,
+					col_price_abs_change: abs_change,
+					col_price_per_change: percent_change,
 					col_price_update_time: time
 				}
+
+	def convert_time(self, time) -> str:
+		# convert string time to datetime
+		cur_year = datetime.now().strftime("%Y")
+		print(time)
+		finished = False
+		if not finished:
+			try:
+				time = datetime.strptime(time + cur_year, "(%d %B)%Y").isoformat()
+				finished = True
+			except ValueError:
+				pass
+		if not finished:
+			try:
+				time = datetime.strptime(time + cur_year, "(%B. price)%Y").isoformat()
+				finished = True
+			except ValueError:
+				pass
+		if not finished:
+			try:
+				time = datetime.fromtimestamp(int(time)).isoformat()
+				finished = True
+			except ValueError:
+				pass
+		if not finished:
+			try:
+				today = datetime.now()
+				delay_day = int(time.split()[0][1:])
+				time = (today - timedelta(days=delay_day)).isoformat()
+				finished = True
+			except ValueError:
+				pass
+		if not finished:
+			raise ValueError("time with string: %s cannot be parsed with current settings." % time)
+		return time
