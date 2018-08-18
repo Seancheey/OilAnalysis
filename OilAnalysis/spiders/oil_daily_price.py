@@ -2,6 +2,7 @@
 import scrapy
 from OilAnalysis.sqlsettings import *
 from datetime import datetime, timedelta
+from OilAnalysis.runspider import run
 
 
 class OilDailyPriceSpider(scrapy.Spider):
@@ -43,7 +44,6 @@ class OilDailyPriceSpider(scrapy.Spider):
 	def convert_time(self, time) -> str:
 		# convert string time to datetime
 		cur_year = datetime.now().strftime("%Y")
-		print(time)
 		finished = False
 		if not finished:
 			try:
@@ -74,3 +74,7 @@ class OilDailyPriceSpider(scrapy.Spider):
 		if not finished:
 			raise ValueError("time with string: %s cannot be parsed with current settings." % time)
 		return time
+
+
+if __name__ == "__main__":
+	run(OilDailyPriceSpider)
