@@ -2,6 +2,7 @@
 import scrapy
 from OilAnalysis.runspider import run
 from OilAnalysis.sqlsettings import *
+from datetime import datetime
 
 
 class OilNewsSpider(scrapy.Spider):
@@ -24,6 +25,9 @@ class OilNewsSpider(scrapy.Spider):
 		author = news.css("span.article_byline a::text").extract_first()
 		date = news.css("span.article_byline::text").extract()[1][3:]
 		content = "\n".join(response.css('div#news-content p::text').extract())
+		# format publish_time to standard datetime before insert
+		date_str = date.replace("CDT", "CST")
+		date = datetime.strptime(date_str, "%b %d, %Y, %I:%M %p %Z").isoformat()
 		yield {
 			col_news_title: title,
 			col_news_date: date,
