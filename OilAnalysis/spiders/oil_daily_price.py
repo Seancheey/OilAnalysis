@@ -79,7 +79,6 @@ class OilDailyPriceSpider(scrapy.Spider):
 if __name__ == "__main__":
     try:
         with open("price_last_update.txt", "r") as f:
-            "2018-09-10T00:11:18.552291"
             last_time = datetime.strptime(f.readline(), "%Y-%m-%dT%H:%M:%S.%f")
             if (datetime.now() - last_time).days >= 1:
                 run(OilDailyPriceSpider)
