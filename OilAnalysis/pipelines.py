@@ -6,7 +6,6 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from OilAnalysis.settings import engine
 from OilAnalysis.sqlsettings import *
-from datetime import datetime
 from abc import ABC, abstractmethod
 from scrapy.exceptions import CloseSpider
 
