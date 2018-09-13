@@ -5,7 +5,7 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from OilAnalysis.settings import engine
-from OilAnalysis.sqlsettings import *
+from OilAnalysis.tableddl import *
 from abc import ABC, abstractmethod
 from scrapy.exceptions import CloseSpider
 
@@ -17,7 +17,7 @@ class SQLExportPipeline(ABC):
 
     @property
     @abstractmethod
-    def settings(self) -> SQLSettings:
+    def table_ddl(self) -> TableDDL:
         pass
 
     @property
@@ -29,8 +29,8 @@ class SQLExportPipeline(ABC):
         self.connection = engine.connect()
 
     def open_spider(self, spider):
-        if spider.name == self.target_spider_name and not engine.has_table(self.settings.table_name):
-            self.connection.execute(self.settings.gen_create_query())
+        if spider.name == self.target_spider_name and not engine.has_table(self.table_ddl.table_name):
+            self.connection.execute(self.table_ddl.create_query)
 
     def close_spider(self, spider):
         if spider.name == self.target_spider_name:
@@ -40,7 +40,7 @@ class SQLExportPipeline(ABC):
         if spider.name != self.target_spider_name:
             return item
         item = self.pre_process_item(item)
-        self.connection.execute(self.settings.insert_query(item))
+        self.connection.execute(self.table_ddl.insert_query(item))
         return item
 
     def close_spider(self):
@@ -52,7 +52,7 @@ class SQLExportPipeline(ABC):
 
 
 class OilNewsPipeline(SQLExportPipeline):
-    settings = oil_news_settings
+    table_ddl = oil_news_DDL
     target_spider_name = "oilnews"
 
     def pre_process_item(self, item):
@@ -60,7 +60,7 @@ class OilNewsPipeline(SQLExportPipeline):
 
 
 class OilDailyPricePipeline(SQLExportPipeline):
-    settings = oil_daily_price_settings
+    table_ddl = oil_price_DDL
     target_spider_name = "oil_daily_price"
 
     def pre_process_item(self, item):

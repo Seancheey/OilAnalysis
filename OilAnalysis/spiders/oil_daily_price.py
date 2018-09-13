@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from OilAnalysis.sqlsettings import *
+from OilAnalysis.tableddl import *
 from datetime import datetime, timedelta
 from OilAnalysis.runspider import run
 
@@ -33,12 +33,12 @@ class OilDailyPriceSpider(scrapy.Spider):
                 abs_change = float(row.css('td.change_up::text,td.change_down::text').extract_first())
                 last_price = float(row.css('td.last_price::text').extract_first())
                 yield {
-                    col_price_category: table_name,
-                    col_price_index_name: row.css('td::text').extract_first(),
-                    col_price_last: last_price,
-                    col_price_abs_change: abs_change,
-                    col_price_per_change: percent_change,
-                    col_price_update_time: time
+                    "category": table_name,
+                    "index": row.css('td::text').extract_first(),
+                    "price": last_price,
+                    "abs_change": abs_change,
+                    "percent_change": percent_change,
+                    "price_time": time
                 }
 
     def convert_time(self, time) -> str:

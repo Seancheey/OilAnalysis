@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from OilAnalysis.runspider import run
-from OilAnalysis.sqlsettings import *
+from OilAnalysis.tableddl import *
 from datetime import datetime
 
 
@@ -33,10 +33,10 @@ class OilNewsSpider(scrapy.Spider):
         content = content.replace(")", " ")
         content = content.replace("'", " ")
         yield {
-            col_news_title: title,
-            col_news_date: date,
-            col_news_author: author,
-            col_news_content: content
+            "title": title,
+            "publish_date": date,
+            "author": author,
+            "content": content
         }
 
 
