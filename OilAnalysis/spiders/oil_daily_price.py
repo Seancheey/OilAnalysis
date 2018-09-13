@@ -80,7 +80,7 @@ if __name__ == "__main__":
     try:
         with open("price_last_update.txt", "r") as f:
             last_time = datetime.strptime(f.readline(), "%Y-%m-%dT%H:%M:%S.%f")
-            if (datetime.now() - last_time).days >= 1:
+            if (datetime.now() - last_time).days >= 1 or (datetime.now() - last_time).seconds >= 84600:
                 run(OilDailyPriceSpider)
             else:
                 pass
