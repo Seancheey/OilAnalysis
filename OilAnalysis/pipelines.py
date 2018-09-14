@@ -28,9 +28,13 @@ class SQLExportPipeline(ABC):
     def __init__(self):
         self.connection = engine.connect()
 
+    def initialize_table(self, ddl):
+        if not engine.has_table(ddl.table_name):
+            self.connection.execute(ddl.create_query)
+
     def open_spider(self, spider):
-        if spider.name == self.target_spider_name and not engine.has_table(self.table_ddl.table_name):
-            self.connection.execute(self.table_ddl.create_query)
+        if spider.name == self.target_spider_name:
+            self.initialize_table(self.table_ddl)
 
     def close_spider(self, spider):
         if spider.name == self.target_spider_name:
@@ -40,13 +44,15 @@ class SQLExportPipeline(ABC):
         if spider.name != self.target_spider_name:
             return item
         item = self.pre_process_item(item)
-        self.connection.execute(self.table_ddl.insert_query(item))
+        self.insert_item(item, self.table_ddl)
         return item
+
+    def insert_item(self, item, ddl):
+        self.connection.execute(ddl.insert_query(item))
 
     def close_spider(self):
         raise CloseSpider("")
 
-    @abstractmethod
     def pre_process_item(self, item):
         return item
 
@@ -56,13 +62,62 @@ class OilNewsPipeline(SQLExportPipeline):
     target_spider_name = "oilnews"
 
     def pre_process_item(self, item):
+        # test category exists
         return item
 
 
 class OilDailyPricePipeline(SQLExportPipeline):
     table_ddl = oil_price_DDL
     target_spider_name = "oil_daily_price"
+    cache_categories = {}
+    cache_indices = {}
 
-    def pre_process_item(self, item):
-        # format last update
+    def open_spider(self, spider):
+        if spider.name == self.target_spider_name:
+            self.initialize_table(oil_price_categories_DDL)
+            self.initialize_table(oil_price_indices_DDL)
+            self.initialize_table(self.table_ddl)
+
+    def process_item(self, item, spider):
+        if spider.name != self.target_spider_name:
+            return item
+
+        # try inserting new category name into table
+        cat_name = item["category_name"]
+        if cat_name not in self.cache_categories:
+            category_id_query = "SELECT category_id FROM %s WHERE category_name='%s'" % (
+                oil_price_categories_DDL.table_name, cat_name)
+            res = list(self.connection.execute(category_id_query))
+            if len(res) == 0:
+                self.insert_item({"category_name": cat_name}, oil_price_categories_DDL)
+                category_id = list(self.connection.execute(category_id_query))[0][0]
+            else:
+                category_id = res[0][0]
+            self.cache_categories[cat_name] = category_id
+        else:
+            category_id = self.cache_categories[cat_name]
+
+        # try inserting new index name into table
+        index_name = item["index"]
+        if index_name not in self.cache_indices:
+            index_query = "SELECT index_id FROM %s WHERE index_name='%s'" % (oil_price_indices_DDL.table_name, index_name)
+            res = list(self.connection.execute(index_query))
+            if len(res) == 0:
+                self.insert_item({"index_name": index_name, "category_id": category_id}, oil_price_indices_DDL)
+                index_id = list(self.connection.execute(index_query))[0][0]
+            else:
+                index_id = res[0][0]
+            self.cache_indices[index_name] = index_id
+        else:
+            index_id = self.cache_indices[index_name]
+
+        # insert price into table
+        self.insert_item({
+            "index_id": index_id, "price": item["price"], "price_time": item["price_time"]
+        }, self.table_ddl)
+
         return item
+
+
+if __name__ == "__main__":
+    pass

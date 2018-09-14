@@ -33,7 +33,7 @@ class OilDailyPriceSpider(scrapy.Spider):
                 abs_change = float(row.css('td.change_up::text,td.change_down::text').extract_first())
                 last_price = float(row.css('td.last_price::text').extract_first())
                 yield {
-                    "category": table_name,
+                    "category_name": table_name,
                     "index": row.css('td::text').extract_first(),
                     "price": last_price,
                     "abs_change": abs_change,

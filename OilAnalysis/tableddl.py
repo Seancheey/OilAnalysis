@@ -25,8 +25,10 @@ class TableDDL:
                    self.column_types.items()]
         return "CREATE TABLE IF NOT EXISTS %s(%s, %s)" % (self.table_name, ",".join(entries), self.constraints)
 
-    @property
-    def insert_query(self, values):
+    def insert_query(self, values: dict):
+        for col_name in values.keys():
+            if col_name not in self.column_definitions:
+                raise KeyError("column name: %s is not found in DDL of %s" % (col_name, self.table_name))
         columns = ",".join(values.keys())
         col_values = ",".join(
             [str(value) if type(value) not in [datetime, str] else "'%s'" % value for value in values.values()]
@@ -50,7 +52,9 @@ oil_price_categories_DDL = TableDDL(
     column_definitions={
         "category_id": ("int", "auto_increment"),
         "category_name": ("varchar(50)", "not null")
-    }
+    },
+    constraints="constraint oil_price_categories_category_name_uindex\
+  unique (category_name)"
 )
 
 oil_price_indices_DDL = TableDDL(
