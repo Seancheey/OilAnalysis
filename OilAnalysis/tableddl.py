@@ -50,7 +50,7 @@ oil_news_DDL = TableDDL(
 oil_price_categories_DDL = TableDDL(
     table_name="oil_price_categories",
     column_definitions={
-        "category_id": ("int", "auto_increment"),
+        "category_id": ("int", "auto_increment primary key"),
         "category_name": ("varchar(50)", "not null")
     },
     constraints="constraint oil_price_categories_category_name_uindex\
@@ -70,7 +70,7 @@ oil_price_indices_DDL = TableDDL(
 oil_price_DDL = TableDDL(
     table_name="oil_prices",
     column_definitions={
-        "id": ("int", "primary key auto_increment"),
+        "id": ("int", "auto_increment primary key"),
         "index_id": ("int", "not null"),
         "price": ("float", "not null"),
         "price_time": ("datetime", "not null"),
