@@ -95,6 +95,6 @@ ITEM_PIPELINES = {
 # Below starts my custom settings
 ####################
 
-__local_engine = create_engine("mysql+pymysql://root@localhost:3306/oil_analysis")
+__local_engine = create_engine("mysql+pymysql://sean:371sqySQY@localhost:3306/oil_analysis")
 
 engine = __local_engine
