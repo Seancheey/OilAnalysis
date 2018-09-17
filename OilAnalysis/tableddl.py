@@ -77,7 +77,9 @@ oil_price_DDL = TableDDL(
         "retrieve_time": ("timestamp", "default CURRENT_TIMESTAMP")
     },
     constraints="constraint oil_prices_oil_price_indices_index_id_fk\
-  foreign key (index_id) references oil_price_indices (index_id)"
+  foreign key (index_id) references oil_price_indices (index_id),\
+               constraint price_time_index_constraint\
+  unique (price_time,index_id)"
 )
 
 
