@@ -7,7 +7,7 @@ class TableDDL:
     def __init__(self, table_name, column_definitions, constraints=None):
         self.table_name = table_name
         self.column_definitions = column_definitions
-        self.constraints = constraints
+        self.constraints = constraints if constraints is not None else []
 
     @property
     def column_types(self):
@@ -23,7 +23,8 @@ class TableDDL:
     def create_query(self):
         entries = ["%s %s %s" % (c, t, self.column_suffix[c] if c in self.column_suffix else "") for c, t in
                    self.column_types.items()]
-        return "CREATE TABLE IF NOT EXISTS %s(%s, %s)" % (self.table_name, ",".join(entries), self.constraints)
+        constraint = ",\n\t"+",\n\t".join(self.constraints) if len(self.constraints) else ""
+        return "CREATE TABLE IF NOT EXISTS %s(\n\t%s%s\n);" % (self.table_name, ",\n\t".join(entries), constraint)
 
     def insert_query(self, values: dict):
         for col_name in values.keys():
@@ -34,6 +35,9 @@ class TableDDL:
             [str(value) if type(value) not in [datetime, str] else "'%s'" % value for value in values.values()]
         )
         return "INSERT INTO %s(%s) VALUES (%s);" % (self.table_name, columns, col_values)
+
+    def __str__(self):
+        return self.create_query
 
 
 oil_news_DDL = TableDDL(
@@ -53,8 +57,7 @@ oil_price_categories_DDL = TableDDL(
         "category_id": ("int", "auto_increment primary key"),
         "category_name": ("varchar(50)", "not null")
     },
-    constraints="constraint oil_price_categories_category_name_uindex\
-  unique (category_name)"
+    constraints=["constraint oil_price_categories_category_name_uindex unique (category_name)"]
 )
 
 oil_price_indices_DDL = TableDDL(
@@ -64,7 +67,7 @@ oil_price_indices_DDL = TableDDL(
         "index_name": ("varchar(50)", "null"),
         "category_id": ("int", "null")
     },
-    constraints="constraint category_fk foreign key (category_id) references oil_price_categories (category_id)"
+    constraints=["constraint category_fk foreign key (category_id) references oil_price_categories (category_id)"]
 )
 
 oil_price_DDL = TableDDL(
@@ -76,15 +79,18 @@ oil_price_DDL = TableDDL(
         "price_time": ("datetime", "not null"),
         "retrieve_time": ("timestamp", "default CURRENT_TIMESTAMP")
     },
-    constraints="constraint oil_prices_oil_price_indices_index_id_fk\
-  foreign key (index_id) references oil_price_indices (index_id),\
-               constraint price_time_index_constraint\
-  unique (price_time,index_id)"
+    constraints=[
+        "constraint oil_prices_oil_price_indices_index_id_fk foreign key (index_id) references oil_price_indices (index_id)",
+        "constraint price_time_index_constraint unique (price_time,index_id)"
+    ]
 )
 
 
 def utest():
-    print(oil_price_DDL.create_query)
+    print(oil_news_DDL)
+    print(oil_price_categories_DDL)
+    print(oil_price_indices_DDL)
+    print(oil_price_DDL)
 
 
 if __name__ == "__main__":
