@@ -23,7 +23,7 @@ class TableDDL:
     def create_query(self):
         entries = ["%s %s %s" % (c, t, self.column_suffix[c] if c in self.column_suffix else "") for c, t in
                    self.column_types.items()]
-        constraint = ",\n\t"+",\n\t".join(self.constraints) if len(self.constraints) else ""
+        constraint = ",\n\t" + ",\n\t".join(self.constraints) if len(self.constraints) else ""
         return "CREATE TABLE IF NOT EXISTS %s(\n\t%s%s\n);" % (self.table_name, ",\n\t".join(entries), constraint)
 
     def insert_query(self, values: dict):
@@ -85,12 +85,38 @@ oil_price_DDL = TableDDL(
     ]
 )
 
+oil_stock_categories_DDL = TableDDL(
+    table_name="oil_stock_categories",
+    column_definitions={
+        "id": ("int", "auto_increment primary key"),
+        "stock_name": ("varchar(50)", "not null")
+    },
+    constraints=["constraint oil_stock_categories_stock_name_uindex unique (stock_name)"]
+)
+
+oil_stock_DDL = TableDDL(
+    table_name="oil_stocks",
+    column_definitions={
+        "id": ("int", "auto_increment primary key"),
+        "stock_id": ("int", "not null"),
+        "volume": ("float", "not null"),
+        "update_time": ("datetime", "not null"),
+        "retrieve_time": ("timestamp", "default CURRENT_TIMESTAMP")
+    },
+    constraints=[
+        "constraint oil_stock_category_fk foreign key (stock_id) references oil_stocks (id)",
+        "constraint oil_volume_time_unique unique (update_time,stock_id)"
+    ]
+)
+
 
 def utest():
     print(oil_news_DDL)
     print(oil_price_categories_DDL)
     print(oil_price_indices_DDL)
     print(oil_price_DDL)
+    print(oil_stock_categories_DDL)
+    print(oil_stock_DDL)
 
 
 if __name__ == "__main__":
