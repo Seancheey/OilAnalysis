@@ -61,10 +61,6 @@ class OilNewsPipeline(SQLExportPipeline):
     table_ddl = oil_news_DDL
     target_spider_name = "oilnews"
 
-    def pre_process_item(self, item):
-        # test category exists
-        return item
-
 
 class OilDailyPricePipeline(SQLExportPipeline):
     table_ddl = oil_price_DDL

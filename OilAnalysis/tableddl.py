@@ -39,26 +39,16 @@ class TableDDL:
     def __str__(self):
         return self.create_query
 
-
-oil_news_categories_DDL = TableDDL(
-    table_name="oil_news_categories",
-    column_definitions={
-        "category_id": ("int", "primary key AUTO_INCREMENT"),
-        "category_name": ("varchar(50)", "not null")
-    },
-    constraints=["constraint oil_news_categories_u unique (category_name)"]
-)
-
 oil_news_DDL = TableDDL(
     table_name="oil_news",
     column_definitions={
         "id": ("int", "primary key AUTO_INCREMENT"),
         "title": ("VARCHAR(100)", "not null"),
-        "publish_date": ("date", "not null"),
+        "publish_date": ("datetime", "not null"),
         "author": ("VARCHAR(100)", "null"),
         "content": ("text", "not null"),
         "reference": ("VARCHAR(300)", "null"),
-        "create_time": ("TIMESTAMP", "default CURRENT_TIMESTAMP"),
+        "retrieve_time": ("TIMESTAMP", "default CURRENT_TIMESTAMP"),
     },
     constraints=[
         "constraint title_publish_date_unique unique (title, publish_date)"
@@ -125,7 +115,6 @@ oil_stock_DDL = TableDDL(
 
 
 def utest():
-    print(oil_news_categories_DDL)
     print(oil_news_DDL)
     print(oil_price_categories_DDL)
     print(oil_price_indices_DDL)
