@@ -10,6 +10,7 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
 from sqlalchemy import create_engine
+import logging
 
 BOT_NAME = 'OilAnalysis'
 
@@ -94,6 +95,7 @@ ITEM_PIPELINES = {
 ####################
 # Below starts my custom settings
 ####################
+LOG_LEVEL = logging.CRITICAL
 
 __local_engine = create_engine("mysql+pymysql://sean:371sqySQY@localhost:3306/oil_analysis")
 
