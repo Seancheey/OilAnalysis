@@ -6,9 +6,18 @@
 # http://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy.loader import Item
+from scrapy.loader.processors import Join, TakeFirst
+from datetime import datetime
 
 
-class OilanalysisItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class NewsItem(Item):
+    title = scrapy.Field(output_processor=TakeFirst())
+    author = scrapy.Field(output_processor=TakeFirst())
+    # convert '?' to other
+    content = scrapy.Field(input_processor=Join("\n"), output_processor=TakeFirst())
+    publish_date = scrapy.Field(
+        input_processor=lambda x: datetime.strptime(" ".join(x[1].split()[:-1]), "- %b %d, %Y, %I:%M %p"),
+        output_processor=lambda x: x[0].isoformat()
+    )
+    reference = scrapy.Field(output_processor=TakeFirst())

@@ -1,22 +1,10 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from scrapy.loader import ItemLoader, Item
-from scrapy.loader.processors import Join, TakeFirst
+from scrapy.loader import ItemLoader
 from scrapy.exceptions import CloseSpider
 from OilAnalysis.runspider import run
 from datetime import datetime
-
-
-class News(Item):
-    title = scrapy.Field(output_processor=TakeFirst())
-    author = scrapy.Field(output_processor=TakeFirst())
-    # convert '?' to other
-    content = scrapy.Field(input_processor=Join("\n"), output_processor=TakeFirst())
-    publish_date = scrapy.Field(
-        input_processor=lambda x: datetime.strptime(" ".join(x[1].split()[:-1]), "- %b %d, %Y, %I:%M %p"),
-        output_processor=lambda x: x[0].isoformat()
-    )
-    reference = scrapy.Field(output_processor=TakeFirst())
+from OilAnalysis.items import NewsItem
 
 
 class OilNewsSpider(scrapy.Spider):
@@ -30,7 +18,7 @@ class OilNewsSpider(scrapy.Spider):
                  'https://oilprice.com/Energy/Gas-Prices',
                  'https://oilprice.com/Energy/Natural-Gas',
                  'https://oilprice.com/Energy/Coal']
-    only_today = False
+    only_today = True
 
     def parse(self, response):
         yield from self.parse_page(response)
@@ -47,7 +35,7 @@ class OilNewsSpider(scrapy.Spider):
         yield response.follow(next_url, self.parse_page)
 
     def parse_news_content(self, response):
-        loader = ItemLoader(item=News(), response=response)
+        loader = ItemLoader(item=NewsItem(), response=response)
         loader.add_css("title", "div.singleArticle__content h1::text")
         loader.add_css("author", "div.singleArticle__content span.article_byline a::text")
         loader.add_css("publish_date", "div.singleArticle__content span.article_byline::text")
