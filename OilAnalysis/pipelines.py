@@ -17,7 +17,7 @@ class SQLExportPipeline(ABC):
 
     @property
     @abstractmethod
-    def table_ddl(self) -> TableDDL:
+    def target_tables(self):
         pass
 
     @property
@@ -28,13 +28,10 @@ class SQLExportPipeline(ABC):
     def __init__(self):
         self.connection = engine.connect()
 
-    def initialize_table(self, ddl):
-        if not engine.has_table(ddl.table_name):
-            self.connection.execute(ddl.create_query)
-
     def open_spider(self, spider):
         if spider.name == self.target_spider_name:
-            self.initialize_table(self.table_ddl)
+            for table_ddl in self.target_tables:
+                self.initialize_table(table_ddl)
 
     def close_spider(self, spider):
         if spider.name == self.target_spider_name:
@@ -44,8 +41,13 @@ class SQLExportPipeline(ABC):
         if spider.name != self.target_spider_name:
             return item
         item = self.pre_process_item(item)
-        self.insert_item(item, self.table_ddl)
+        for ddl in self.target_tables:
+            self.insert_item({k: v for k, v in item.items() if k in ddl.column_definitions}, ddl)
         return item
+
+    def initialize_table(self, ddl):
+        if not engine.has_table(ddl.table_name):
+            self.connection.execute(ddl.create_query)
 
     def insert_item(self, item, ddl):
         self.connection.execute(ddl.insert_query(item))
@@ -58,21 +60,15 @@ class SQLExportPipeline(ABC):
 
 
 class OilNewsPipeline(SQLExportPipeline):
-    table_ddl = oil_news_DDL
+    target_tables = [oil_news_DDL]
     target_spider_name = "oilnews"
 
 
 class OilDailyPricePipeline(SQLExportPipeline):
-    table_ddl = oil_price_DDL
+    target_tables = [oil_price_categories_DDL, oil_price_indices_DDL, oil_price_DDL]
     target_spider_name = "oil_daily_price"
     cache_categories = {}
     cache_indices = {}
-
-    def open_spider(self, spider):
-        if spider.name == self.target_spider_name:
-            self.initialize_table(oil_price_categories_DDL)
-            self.initialize_table(oil_price_indices_DDL)
-            self.initialize_table(self.table_ddl)
 
     def process_item(self, item, spider):
         if spider.name != self.target_spider_name:
@@ -96,7 +92,8 @@ class OilDailyPricePipeline(SQLExportPipeline):
         # try inserting new index name into table
         index_name = item["index"]
         if index_name not in self.cache_indices:
-            index_query = "SELECT index_id FROM %s WHERE index_name='%s'" % (oil_price_indices_DDL.table_name, index_name)
+            index_query = "SELECT index_id FROM %s WHERE index_name='%s'" % (
+                oil_price_indices_DDL.table_name, index_name)
             res = list(self.connection.execute(index_query))
             if len(res) == 0:
                 self.insert_item({"index_name": index_name, "category_id": category_id}, oil_price_indices_DDL)
@@ -110,8 +107,7 @@ class OilDailyPricePipeline(SQLExportPipeline):
         # insert price into table
         self.insert_item({
             "index_id": index_id, "price": item["price"], "price_time": item["price_time"]
-        }, self.table_ddl)
-
+        }, oil_price_DDL)
         return item
 
 
