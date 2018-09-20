@@ -105,7 +105,7 @@ oil_stock_DDL = TableDDL(
         "stock_id": ("int", "not null"),
         "volume": ("float", "not null"),
         "update_time": ("datetime", "not null"),
-        "retrieve_time": ("timestamp", "default CURRENT_TIMESTAMP")
+        "retrieve_time": ("timestamp", "not null default CURRENT_TIMESTAMP")
     },
     constraints=[
         "constraint oil_stock_category_fk foreign key (stock_id) references oil_stocks (id)",
