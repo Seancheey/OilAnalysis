@@ -40,17 +40,31 @@ class TableDDL:
         return self.create_query
 
 
+oil_news_categories_DDL = TableDDL(
+    table_name="oil_news_categories",
+    column_definitions={
+        "category_id": ("int", "primary key AUTO_INCREMENT"),
+        "category_name": ("varchar(50)", "not null")
+    },
+    constraints=["constraint oil_news_categories_u unique (category_name)"]
+)
+
 oil_news_DDL = TableDDL(
     table_name="oil_news",
     column_definitions={
         "id": ("int", "primary key AUTO_INCREMENT"),
         "title": ("VARCHAR(100)", "not null"),
         "publish_date": ("date", "not null"),
-        "author": ("VARCHAR(100)", "not null"),
+        "author": ("VARCHAR(100)", "null"),
         "content": ("text", "not null"),
+        "reference": ("VARCHAR(300)", "null"),
         "create_time": ("TIMESTAMP", "default CURRENT_TIMESTAMP"),
-    }
+    },
+    constraints=[
+        "constraint title_publish_date_unique unique (title, publish_date)"
+    ]
 )
+
 oil_price_categories_DDL = TableDDL(
     table_name="oil_price_categories",
     column_definitions={
@@ -80,7 +94,7 @@ oil_price_DDL = TableDDL(
         "retrieve_time": ("timestamp", "default CURRENT_TIMESTAMP")
     },
     constraints=[
-        "constraint oil_prices_oil_price_indices_index_id_fk foreign key (index_id) references oil_price_indices (index_id)",
+        "constraint oil_prices_indices_index_id_fk foreign key (index_id) references oil_price_indices (index_id)",
         "constraint price_time_index_constraint unique (price_time,index_id)"
     ]
 )
@@ -111,6 +125,7 @@ oil_stock_DDL = TableDDL(
 
 
 def utest():
+    print(oil_news_categories_DDL)
     print(oil_news_DDL)
     print(oil_price_categories_DDL)
     print(oil_price_indices_DDL)
