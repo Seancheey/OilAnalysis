@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.loader import ItemLoader
-from scrapy.exceptions import CloseSpider
 from OilAnalysis.runspider import run
-from datetime import datetime
 from OilAnalysis.items import NewsItem
 
 
@@ -30,9 +28,10 @@ class OilNewsSpider(scrapy.Spider):
         for article in response.css('div.categoryArticle'):
             news_url = article.css('a::attr("href")').extract_first()
             yield response.follow(news_url, self.parse_news_content)
-        # go to next page
-        next_url = response.css('div.pagination a.next::attr("href")').extract_first()
-        yield response.follow(next_url, self.parse_page)
+        if not OilNewsSpider.only_today:
+            # go to next page
+            next_url = response.css('div.pagination a.next::attr("href")').extract_first()
+            yield response.follow(next_url, self.parse_page)
 
     def parse_news_content(self, response):
         loader = ItemLoader(item=NewsItem(), response=response)
@@ -42,10 +41,7 @@ class OilNewsSpider(scrapy.Spider):
         loader.add_css("content", "div#news-content p::text, div#article-content p::text")
         loader.add_value("reference", response.url)
         item = loader.load_item()
-        if OilNewsSpider.only_today and (datetime.now() - item['publish_date']).days >= 1:
-            raise CloseSpider("publish_date exceed limit")
-        else:
-            yield loader.load_item()
+        yield item
 
 
 if __name__ == "__main__":
