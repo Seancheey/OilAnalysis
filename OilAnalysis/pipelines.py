@@ -7,7 +7,8 @@
 from OilAnalysis.settings import engine
 from OilAnalysis.tableddl import *
 from abc import ABC, abstractmethod
-from scrapy.exceptions import CloseSpider
+from sqlalchemy.exc import IntegrityError
+import logging
 
 
 # Aug 16, 2018, 11:00 AM CDT
@@ -50,10 +51,11 @@ class SQLExportPipeline(ABC):
             self.connection.execute(ddl.create_query)
 
     def insert_item(self, item, ddl):
-        self.connection.execute(ddl.insert_query(item))
-
-    def close_spider(self):
-        raise CloseSpider("")
+        query = ddl.insert_query(item)
+        try:
+            self.connection.execute(query)
+        except IntegrityError:
+            pass
 
     def pre_process_item(self, item):
         return item

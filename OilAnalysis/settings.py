@@ -95,7 +95,7 @@ ITEM_PIPELINES = {
 ####################
 # Below starts my custom settings
 ####################
-LOG_LEVEL = logging.CRITICAL
+LOG_LEVEL = logging.WARNING
 
 __local_engine = create_engine("mysql+pymysql://sean:371sqySQY@localhost:3306/oil_analysis")
 
