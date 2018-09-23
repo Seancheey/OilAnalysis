@@ -68,7 +68,9 @@ ROBOTSTXT_OBEY = True
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
 	'OilAnalysis.pipelines.OilNewsPipeline': 300,
-	'OilAnalysis.pipelines.OilDailyPricePipeline': 301,
+	'OilAnalysis.pipelines.CategoryJoinPipeline': 199,
+	'OilAnalysis.pipelines.IndexJoinPipeline': 200,
+	'OilAnalysis.pipelines.OilDailyPricePipeline': 201,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -98,5 +100,6 @@ ITEM_PIPELINES = {
 LOG_LEVEL = logging.WARNING
 
 __local_engine = create_engine("mysql+pymysql://sean:371sqySQY@localhost:3306/oil_analysis")
+test_engine = create_engine("mysql+pymysql://sean:371sqySQY@localhost:3306/test")
 
 engine = __local_engine
