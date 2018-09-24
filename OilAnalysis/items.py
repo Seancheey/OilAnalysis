@@ -18,6 +18,6 @@ class NewsItem(Item):
     content = scrapy.Field(input_processor=Join("\n"), output_processor=TakeFirst())
     publish_date = scrapy.Field(
         input_processor=lambda x: datetime.strptime(" ".join(x[1].split()[:-1]), "- %b %d, %Y, %I:%M %p"),
-        output_processor=lambda x: x[0].isoformat()
+        output_processor=lambda x: x[0].isoformat().replace("T", " ")
     )
     reference = scrapy.Field(output_processor=TakeFirst())
