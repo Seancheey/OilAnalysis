@@ -78,7 +78,7 @@ oil_price_table = Table(
     Column("index_id", INTEGER, ForeignKey("oil_price_indices.index_id"), nullable=False),
     Column("price", FLOAT, nullable=False),
     Column("price_time", DATETIME, nullable=False),
-    Column("retrieve_time", TIMESTAMP, default="CURRENT_TIMESTAMP"),
+    Column("retrieve_time", TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")),
 )
 
 
