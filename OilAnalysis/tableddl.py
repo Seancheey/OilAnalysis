@@ -1,51 +1,11 @@
-from datetime import datetime
 from sqlalchemy import MetaData
 from sqlalchemy.sql import text
 from sqlalchemy.schema import Table, Column, UniqueConstraint, ForeignKey
-from sqlalchemy.types import VARCHAR, TEXT, INTEGER, TIMESTAMP, DATE, DATETIME, FLOAT
+from sqlalchemy.types import VARCHAR, TEXT, INTEGER, TIMESTAMP, DATETIME, FLOAT
 from OilAnalysis.settings import test_engine, engine
 
 meta = MetaData()
 meta.bind = engine
-
-# class TableDDL:
-#     __slots__ = "table_name", "column_definitions", "constraints"
-#
-#     def __init__(self, table_name, column_definitions, constraints=None):
-#         self.table_name = table_name
-#         self.column_definitions = column_definitions
-#         self.constraints = constraints if constraints is not None else []
-#
-#     @property
-#     def column_types(self):
-#         return {col_name: (definition[0] if type(definition) == tuple else definition) for col_name, definition in
-#                 self.column_definitions.items()}
-#
-#     @property
-#     def column_suffix(self):
-#         return {col_name: (definition[1] if type(definition) == tuple else "") for col_name, definition in
-#                 self.column_definitions.items()}
-#
-#     @property
-#     def create_query(self):
-#         entries = ["%s %s %s" % (c, t, self.column_suffix[c] if c in self.column_suffix else "") for c, t in
-#                    self.column_types.items()]
-#         constraint = ",\n\t" + ",\n\t".join(self.constraints) if len(self.constraints) else ""
-#         return "CREATE TABLE IF NOT EXISTS %s(\n\t%s%s\n);" % (self.table_name, ",\n\t".join(entries), constraint)
-#
-#     def insert_query(self, values: dict):
-#         for col_name in values.keys():
-#             if col_name not in self.column_definitions:
-#                 raise KeyError("column name: %s is not found in DDL of %s" % (col_name, self.table_name))
-#         columns = ",".join(values.keys())
-#         col_values = ",".join(
-#             [str(value) if type(value) not in [datetime, str] else "'%s'" % value for value in values.values()]
-#         )
-#         return "INSERT INTO %s(%s) VALUES (%s);" % (self.table_name, columns, col_values)
-#
-#     def __str__(self):
-#         return self.create_query
-
 
 oil_news_table = Table(
     "oil_news", meta,

@@ -66,11 +66,12 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
+# Pipeline with smaller number is executed first
 ITEM_PIPELINES = {
-	'OilAnalysis.pipelines.OilNewsPipeline': 300,
 	'OilAnalysis.pipelines.CategoryJoinPipeline': 199,
 	'OilAnalysis.pipelines.IndexJoinPipeline': 200,
 	'OilAnalysis.pipelines.OilDailyPricePipeline': 201,
+	'OilAnalysis.pipelines.OilNewsPipeline': 300
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
