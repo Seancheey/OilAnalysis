@@ -37,13 +37,31 @@ class SQLPipeline(ABC):
         if self.target_spider == spider.name:
             self.connection.close()
 
+    def process_item(self, item, spider):
+        if self.target_spider == spider.name:
+            return self._process_target_item(item)
+        else:
+            return item
+
+    @abstractmethod
+    def _process_target_item(self, item):
+        pass
+
 
 # retrieve id(or any other) of a certain value from a SQL table, then add it to item
 # if value if not found, insert that value
 class SQLItemJoinPipeline(SQLPipeline, ABC):
     __slots__ = "value_cache"
-    search_column_name: str = ...
-    retrieve_column_name: str = ...
+
+    @property
+    @abstractmethod
+    def search_column_name(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def retrieve_column_name(self) -> str:
+        pass
 
     @property
     def search_column(self) -> Column:
@@ -57,9 +75,7 @@ class SQLItemJoinPipeline(SQLPipeline, ABC):
         super().__init__()
         self.value_cache = {}
 
-    def process_item(self, item, spider):
-        if self.target_spider != spider.name:
-            return
+    def _process_target_item(self, item):
         val = item[self.search_column_name]
         if val not in self.value_cache:
             # try retrieve value from table by select query
@@ -79,16 +95,13 @@ class SQLItemJoinPipeline(SQLPipeline, ABC):
 
 
 class SQLExportPipeline(SQLPipeline, ABC):
-    def process_item(self, item, spider):
-        if spider.name != self.target_spider:
-            return item
+    def _process_target_item(self, item):
         try:
             used_item = {k: v for k, v in item.items() if k in self.table.columns}
             query = self.table.insert().values(used_item)
             self.connection.execute(query)
+            return item
         except IntegrityError:
-            pass
-        finally:
             return item
 
 
