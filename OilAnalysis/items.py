@@ -21,3 +21,9 @@ class NewsItem(Item):
         output_processor=lambda x: x[0].isoformat().replace("T", " ")
     )
     reference = scrapy.Field(output_processor=TakeFirst())
+
+
+class StockItem(Item):
+    volume = scrapy.Field(output_processor=TakeFirst())
+    update_time = scrapy.Field(output_processor=TakeFirst())
+    stock_name = scrapy.Field(output_processor=TakeFirst())
