@@ -41,15 +41,26 @@ oil_price_table = Table(
     Column("retrieve_time", TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")),
 )
 
+oil_stock_categories_table = Table(
+    "oil_stock_categories", meta,
+    Column("stock_id", INTEGER, primary_key=True, autoincrement=True),
+    Column("stock_name", VARCHAR(50), nullable=False, unique=True),
+)
+
+oil_stocks_table = Table(
+    "oil_stocks", meta,
+    Column("id", INTEGER, primary_key=True, autoincrement=True),
+    Column("stock_id", INTEGER, ForeignKey("oil_stock_categories.stock_id"), nullable=False),
+    Column("volume", FLOAT, nullable=False),
+    Column("update_time", DATETIME, nullable=False, ),
+    Column("retrieve_time", TIMESTAMP, server_default=text('CURRENT_TIMESTAMP')),
+    UniqueConstraint("update_time", "stock_id")
+)
+
 
 def utest():
     meta.bind = test_engine
-
-    item = {"title": "test1", "publish_date": "1998-7-2 22:00:00", "author": "sean", "content": 'testtet?',
-            "random": "test"}
-    use_item = {k: v for k, v in item.items() if k in oil_news_table.columns}
-    query = oil_news_table.insert().values(use_item)
-    print(query)
+    meta.create_all()
 
 
 if __name__ == "__main__":
