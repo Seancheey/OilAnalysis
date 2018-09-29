@@ -14,7 +14,6 @@ from datetime import datetime
 class NewsItem(Item):
     title = scrapy.Field(output_processor=TakeFirst())
     author = scrapy.Field(output_processor=TakeFirst())
-    # convert '?' to other
     content = scrapy.Field(input_processor=Join("\n"), output_processor=TakeFirst())
     publish_date = scrapy.Field(
         input_processor=lambda x: datetime.strptime(" ".join(x[1].split()[:-1]), "- %b %d, %Y, %I:%M %p"),
