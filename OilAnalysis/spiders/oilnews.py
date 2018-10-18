@@ -38,7 +38,8 @@ class OilNewsSpider(scrapy.Spider):
         loader.add_css("title", "div.singleArticle__content h1::text")
         loader.add_css("author", "div.singleArticle__content span.article_byline a::text")
         loader.add_css("publish_date", "div.singleArticle__content span.article_byline::text")
-        loader.add_css("content", "div#news-content p::text, div#article-content p::text")
+        loader.add_css("content",
+                       "div#news-content p::text, div#article-content p::text, div#article-content span::text")
         loader.add_value("reference", response.url)
         item = loader.load_item()
         yield item
