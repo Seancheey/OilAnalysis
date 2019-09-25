@@ -14,10 +14,14 @@ from datetime import datetime
 def _process_oil_news_time(strings):
     for s in strings:
         try:
+            return datetime.strptime(s, "%b %d, %Y at %H:%M ")
+        except(ValueError, IndexError):
+            pass
+        try:
             return datetime.strptime(" ".join(s.split()[:-1]), "- %b %d, %Y, %I:%M %p")
         except(ValueError, IndexError):
             pass
-    raise ValueError(strings + ' is not parsable')
+    raise ValueError(str(strings) + ' is not parsable')
 
 
 class NewsItem(Item):
