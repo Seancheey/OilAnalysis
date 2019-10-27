@@ -118,7 +118,7 @@ def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: dateti
         return [price for price in result]
 
 
-def get_oil_news(start_time: int, end_time: int) -> list:
+def get_oil_news(start_time: datetime = None, end_time: datetime = None) -> list:
     """
     get oil news within certain range of time. (not required)
 
@@ -126,5 +126,10 @@ def get_oil_news(start_time: int, end_time: int) -> list:
     :param end_time: optional
     :return: list of oil news objects
     """
-
-    pass
+    with new_session() as session:
+        result = session.query(OilNews)
+        if start_time:
+            result = result.filter(OilNews.publish_date > start_time)
+        if end_time:
+            result = result.filter(OilNews.publish_date < end_time)
+        return [news for news in result]
