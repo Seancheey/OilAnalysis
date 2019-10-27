@@ -1,5 +1,6 @@
 from BackEnd.tableddl import *
 from BackEnd.errors import *
+from BackEnd.objects import *
 
 
 def register(username: str, password_sha256: str, email: str):
@@ -26,18 +27,36 @@ def login(username: str, password_sha256: str) -> str:
     pass
 
 
-def comment(session_token: str, ):
+def comment(session_token: str, news_id: int, message: str):
     """
+    logged-in user comment on certain news
+    Should check token expiration and raise error if it does.
 
-    :param session_token:
-    :return:
+    :param session_token: required
+    :param news_id: required
+    :param message: required
     """
     pass
 
 
-def get_oil_prices(session_token: str, start_time: int, end_time: int, oil_type: int) -> list:
+def get_oil_prices(start_time: int, end_time: int, oil_type: int) -> list:
+    """
+    get oil price within certain range (not required) for certain type
+
+    :param start_time: optional
+    :param end_time: optional
+    :param oil_type: required
+    :return: list of oil price objects
+    """
     pass
 
 
-def get_oil_news(session_token: str, start_time: int, end_time: int) -> list:
+def get_oil_news(start_time: int, end_time: int) -> list:
+    """
+    get oil news within certain range of time. (not required)
+
+    :param start_time: optional
+    :param end_time: optional
+    :return: list of oil news objects
+    """
     pass

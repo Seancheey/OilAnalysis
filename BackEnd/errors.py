@@ -16,3 +16,7 @@ class UserDoNotExistsError(BackEndError):
 
 class UserPasswordNoMatchError(BackEndError):
     pass
+
+
+class LoginSessionExpired(BackEndError):
+    pass

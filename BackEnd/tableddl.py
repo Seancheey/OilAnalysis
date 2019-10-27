@@ -38,7 +38,7 @@ oil_price_table = Table(
     Column("index_id", INTEGER, ForeignKey("oil_price_indices.index_id"), nullable=False),
     Column("price", FLOAT, nullable=False),
     Column("price_time", DATETIME, nullable=False),
-    Column("retrieve_time", TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")),
+    Column("retrieve_time", TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
 )
 
 oil_stock_categories_table = Table(
@@ -55,4 +55,26 @@ oil_stocks_table = Table(
     Column("update_time", DATETIME, nullable=False, ),
     Column("retrieve_time", TIMESTAMP, server_default=text('CURRENT_TIMESTAMP')),
     UniqueConstraint("update_time", "stock_id")
+)
+
+user_table = Table(
+    "users", meta,
+    Column("username", VARCHAR(32), primary_key=True),
+    Column("email", VARCHAR(64), unique=True, nullable=False),
+    Column("pass", VARCHAR(256), nullable=False)
+)
+
+login_table = Table(
+    "login_sessions", meta,
+    Column("session_token", VARCHAR(32), primary_key=True),
+    Column("username", VARCHAR(32), ForeignKey("users.username"), nullable=False),
+    Column("expiration_time", TIMESTAMP, nullable=False)
+)
+
+comment_table = Table(
+    "comments", meta,
+    Column("comment_id", primary_key=True, autoincrement=True),
+    Column("news_id", INTEGER, ForeignKey("oil_news.id"), nullable=False),
+    Column("username", VARCHAR(32), ForeignKey("users.username"), nullable=False),
+    Column("text", TEXT, nullable=False)
 )
