@@ -1,2 +1,4 @@
+from BackEnd.tableddl import meta
+
 if __name__ == '__main__':
-    pass
+    meta.create_all()
