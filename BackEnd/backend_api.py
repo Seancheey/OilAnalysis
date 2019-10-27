@@ -1,10 +1,14 @@
 from BackEnd.tableddl import *
 from BackEnd.errors import *
-from BackEnd.objects import *
+from sqlalchemy.orm import sessionmaker
+
+Session = sessionmaker()
+Session.configure(bind=engine)
 
 
-def register(username: str, password_sha256: str, email: str):
+def register(username: str, password_sha256: bytes, email: str):
     """
+    >>> register("user",str.encode('abcdabcdabcdabcdabcdabcdabcdabcd'), "adls371@outlook.com")
     new account registration.
     Should raise different errors if username/email already exists.
 
@@ -12,16 +16,25 @@ def register(username: str, password_sha256: str, email: str):
     :param password_sha256: required, SHA2-256 of the password
     :param email: required
     """
-    pass
+    session = Session()
+    for _ in session.query(User).filter(User.username == username):
+        raise UserAlreadyExistsError
+    for _ in session.query(User).filter(User.email == email):
+        raise EmailAlreadyExistsError
+    user = User(username=username, email=email, password=password_sha256)
+    session.add(user)
+    session.commit()
+    session.close()
 
 
-def login(username: str, password_sha256: str) -> str:
+def login(username: str, password_sha256: str, expire_day_len: int = 30) -> bytes:
     """
     make an existing user login. Return a new session id which has an expiration date.
     Should raise errors when user not exists or username and password doesn't match
 
     :param username: required
     :param password_sha256: required
+    :param expire_day_len: optional, days before returned login token expires
     :return: session token for user which user should carry around for logged-in operations
     """
     pass
