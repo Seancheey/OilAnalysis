@@ -100,16 +100,22 @@ def comment(session_token: str, news_id: int, message: str):
         assert False
 
 
-def get_oil_prices(start_time: int, end_time: int, oil_type: int) -> list:
+def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None) -> list:
     """
     get oil price within certain range (not required) for certain type
 
+    :param oil_index: id of certain index name for oil, required
     :param start_time: optional
     :param end_time: optional
-    :param oil_type: required
     :return: list of oil price objects
     """
-    pass
+    with new_session() as session:
+        result = session.query(OilPrice).filter(OilPrice.index_id == oil_index)
+        if start_time:
+            result = result.filter(OilPrice.price_time > start_time)
+        if end_time:
+            result = result.filter(OilPrice.price_time < end_time)
+        return [price for price in result]
 
 
 def get_oil_news(start_time: int, end_time: int) -> list:
@@ -120,4 +126,5 @@ def get_oil_news(start_time: int, end_time: int) -> list:
     :param end_time: optional
     :return: list of oil news objects
     """
+
     pass
