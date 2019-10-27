@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import text
 from sqlalchemy.schema import Column, UniqueConstraint, ForeignKey
-from sqlalchemy.types import VARCHAR, TEXT, INTEGER, TIMESTAMP, DATETIME, FLOAT, VARBINARY
+from sqlalchemy.types import VARCHAR, TEXT, INTEGER, TIMESTAMP, DATETIME, FLOAT, VARBINARY, CHAR
 from BackEnd.settings import engine
 
 Base = declarative_base(bind=engine)
@@ -66,7 +66,7 @@ class User(Base):
 
 class LoginSession(Base):
     __tablename__ = "login_sessions"
-    session_token = Column(VARBINARY(32), primary_key=True)
+    session_token = Column(CHAR(16), primary_key=True)
     username = Column(VARCHAR(32), ForeignKey("users.username"), nullable=False)
     expiration_time = Column(TIMESTAMP, nullable=False)
 

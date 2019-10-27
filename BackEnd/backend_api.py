@@ -1,6 +1,9 @@
 from BackEnd.tableddl import *
 from BackEnd.errors import *
 from sqlalchemy.orm import sessionmaker
+from datetime import datetime, timedelta
+from random import choices
+from string import ascii_letters
 
 Session = sessionmaker()
 Session.configure(bind=engine)
@@ -8,7 +11,8 @@ Session.configure(bind=engine)
 
 def register(username: str, password_sha256: bytes, email: str):
     """
-    >>> register("user",str.encode('abcdabcdabcdabcdabcdabcdabcdabcd'), "adls371@outlook.com")
+    >>> register("user",b'abcdabcdabcdabcdabcdabcdabcdabcd', "adls371@outlook.com")
+
     new account registration.
     Should raise different errors if username/email already exists.
 
@@ -27,8 +31,13 @@ def register(username: str, password_sha256: bytes, email: str):
     session.close()
 
 
-def login(username: str, password_sha256: str, expire_day_len: int = 30) -> bytes:
+def login(username: str, password_sha256: bytes, expire_day_len: int = 30) -> str:
     """
+    >>> import random
+    >>> random.seed(0)
+    >>> login("user", b'abcdabcdabcdabcdabcdabcdabcdabcd')
+    'RNvnAvOpyEVAoNGn'
+
     make an existing user login. Return a new session id which has an expiration date.
     Should raise errors when user not exists or username and password doesn't match
 
@@ -37,7 +46,23 @@ def login(username: str, password_sha256: str, expire_day_len: int = 30) -> byte
     :param expire_day_len: optional, days before returned login token expires
     :return: session token for user which user should carry around for logged-in operations
     """
-    pass
+    session = Session()
+    result = session.query(User).filter(User.username == username, User.password == password_sha256)
+    if result.count() == 0:
+        for _ in session.query(User).filter(User.username == username):
+            raise UserPasswordNoMatchError
+        raise UserDoNotExistsError
+    else:
+        for user in result:
+            # generate session
+            raw = ''.join(choices(ascii_letters, k=LoginSession.session_token.property.columns[0].type.length))
+            exp_date = datetime.now() + timedelta(days=expire_day_len)
+            session.add(LoginSession(session_token=raw, username=user.username, expiration_time=exp_date))
+            session.commit()
+            session.close()
+            return raw
+    session.close()
+    raise BackEndError
 
 
 def comment(session_token: str, news_id: int, message: str):
