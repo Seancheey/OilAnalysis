@@ -2,7 +2,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.sql import text
 from sqlalchemy.schema import Table, Column, UniqueConstraint, ForeignKey
 from sqlalchemy.types import VARCHAR, TEXT, INTEGER, TIMESTAMP, DATETIME, FLOAT
-from OilAnalysis.settings import test_engine, engine
+from BackEnd.settings import engine
 
 meta = MetaData()
 meta.bind = engine
@@ -56,12 +56,3 @@ oil_stocks_table = Table(
     Column("retrieve_time", TIMESTAMP, server_default=text('CURRENT_TIMESTAMP')),
     UniqueConstraint("update_time", "stock_id")
 )
-
-
-def utest():
-    meta.bind = test_engine
-    meta.create_all()
-
-
-if __name__ == "__main__":
-    utest()

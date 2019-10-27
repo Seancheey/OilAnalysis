@@ -4,10 +4,10 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from OilAnalysis.tableddl import *
+from BackEnd.tableddl import *
 from abc import ABC, abstractmethod
 from sqlalchemy.exc import IntegrityError
-from OilAnalysis.settings import engine
+from BackEnd.settings import engine
 
 
 class SQLPipeline(ABC):
