@@ -52,7 +52,7 @@ CREATE SCHEMA oil_analysis; # production database
 at root of project:
 
 ```
-python3 -m python3 -m BackEnd.initialize_database
+python3 -m BackEnd.initialize_database
 ```
 
 Using BackEnd
