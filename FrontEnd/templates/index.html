@@ -10,6 +10,7 @@
     <!-- Bootstrap core CSS -->
 <link href="../static/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 <link rel="stylesheet" id="compiled.css-css" href="https://mdbootstrap.com/wp-content/themes/mdbootstrap4/css/compiled-4.8.11.min.css?ver=4.8.11" type="text/css" media="all">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.0.2/sha.js"></script>
 
     <style>
@@ -58,14 +59,48 @@
         <a class="text-muted" href="#">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-3" focusable="false" role="img"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"></circle><line x1="21" y1="21" x2="15.8" y2="15.8"></line></svg>
         </a>
-        {% if token %}
-        <a class="btn btn-sm btn-outline-primary" href="" data-toggle="modal" data-target="#modalLRForm">{{ username }}</a>
+        {% if username %}
+        <a class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#modalUserInfo" >{{ username }}</a>
         {% else %}
-        <a class="btn btn-sm btn-outline-secondary" href="" data-toggle="modal" data-target="#modalLRForm">Login/Register</a>
+        <a class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#modalLRForm">Login/Register</a>
         {% endif %}
       </div>
     </div>
   </header>
+
+      <div class="modal fade" id="modalUserInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog" role="document">
+        <!--Content-->
+        <div class="modal-content">
+          <!--Header-->
+          <div class="modal-header">
+            <h4 class="modal-title w-100" id="myModalLabel">You</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <!--Body-->
+          <div class="modal-body text-center md-1">
+            Username:
+          </div>
+          <div class="modal-body text-center md-1">
+            Email: {{ username }}
+          </div>
+          <div class="modal-body text-center md-1">
+            Last Login:
+          </div>
+          <!--Footer-->
+          <form action="{{ url_for('logout_handler') }}" method="post">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary waves-effect waves-light" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary waves-effect waves-light">Logout</button>
+          </div>
+          </form>
+        </div>
+        <!--/.Content-->
+      </div>
+    </div>
+
 <div class="col-md-6">
         <!--Modal: Login / Register Form-->
         <div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
@@ -337,16 +372,16 @@
     <script>
       function mySubmit(obj) {
         var pwdObj = document.getElementById('pwd');
-        var hashObj = new jsSHA("SHA-256", "TEXT", {numRounds: 1});
+        var hashObj = new jsSHA("SHA3-256", "TEXT", {numRounds: 1, encoding: "UTF16BE"});
         hashObj.update(pwdObj.value);
-        var hash = hashObj.getHash("HEX");
+        var hash = hashObj.getHash("BYTES");
         pwdObj.value = hash;
       }
       function myRegister(obj) {
         var pwdObj = document.getElementById('pwd_2');
-        var hashObj = new jsSHA("SHA-256", "TEXT", {numRounds: 1});
+        var hashObj = new jsSHA("SHA3-256", "TEXT", {numRounds: 1, encoding: "UTF16BE"});
         hashObj.update(pwdObj.value);
-        var hash = hashObj.getHash("HEX");
+        var hash = hashObj.getHash("BYTES");
         pwdObj.value = hash;
       }
     </script>
