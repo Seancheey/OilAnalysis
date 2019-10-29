@@ -18,6 +18,9 @@ class OilNews(Base):
     reference = Column(VARCHAR(300))
     retrieve_time = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
 
+    def __repr__(self):
+        return "OilNews(id=%d, title=%s)" % (self.id, self.title)
+
 
 class OilCategory(Base):
     __tablename__ = "oil_price_categories"
