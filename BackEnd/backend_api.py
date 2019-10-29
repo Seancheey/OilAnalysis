@@ -27,7 +27,8 @@ def new_session():
 def register(username: str, password_sha256: bytes, email: str):
     """
     >>> with new_session() as s:
-    >>>     s.delete(User).filter_by(username='test_user')
+    ...     assert s.query(User).filter(User.username=='test_user').delete() >= 0
+    ...     s.commit()
     >>> register("test_user",b'abcdabcdabcdabcdabcdabcdabcdabcd', "adls371@outlook.com")
 
     new account registration.
@@ -45,17 +46,13 @@ def register(username: str, password_sha256: bytes, email: str):
         user = User(username=username, email=email, password=password_sha256)
         session.add(user)
         session.commit()
-        return True
 
 
 def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 30) -> str:
     """
-    >>> with new_session() as s:
-    >>>     s.delete(LoginSession).filter_by(username='test_user')
-    >>> import random
-    >>> random.seed(0)
-    >>> login("test_user", b'abcdabcdabcdabcdabcdabcdabcdabcd')
-    'RNvnAvOpyEVAoNGn'
+    >>> with new_session() as session:
+    ...     assert session.query(LoginSession).filter(LoginSession.username=='test_user').delete() >= 0
+    >>> assert len(login("test_user", b'abcdabcdabcdabcdabcdabcdabcdabcd')) > 0
 
     make an existing user login. Return a new session id which has an expiration date.
     Should raise errors when user not exists or username and password doesn't match
@@ -89,8 +86,9 @@ def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 
 
 def get_session_username(session_token: str) -> str:
     """
-    >>> get_session_username('RNvnAvOpyEVAoNGn')
-    'user'
+    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd')
+    >>> get_session_username(token)
+    'test_user'
 
     :param session_token: required
     :return: username for that session provided
@@ -98,7 +96,7 @@ def get_session_username(session_token: str) -> str:
     with new_session() as session:
         token = session.query(LoginSession).filter(LoginSession.session_token == session_token).one_or_none()
         if token:
-            if token.expiration_time > datetime.now():
+            if token.expiration_time < datetime.now():
                 session.delete(token)
                 raise LoginSessionExpired()
             return token.username
@@ -108,7 +106,8 @@ def get_session_username(session_token: str) -> str:
 
 def comment(session_token: str, news_id: int, message: str):
     """
-    >>> comment('RNvnAvOpyEVAoNGn', 1, 'test message')
+    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd')
+    >>> comment(token, 1, 'test message')
 
     logged-in user comment on certain news
     Should check token expiration and raise error if it does.
@@ -120,7 +119,7 @@ def comment(session_token: str, news_id: int, message: str):
     with new_session() as session:
         login_session = session.query(LoginSession).filter(LoginSession.session_token == session_token).one_or_none()
         if login_session:
-            if login_session.expiration_time > datetime.now():
+            if login_session.expiration_time < datetime.now():
                 session.delete(login_session)
             else:
                 session.add(Comment(news_id=news_id, username=login_session.username, text=message))
