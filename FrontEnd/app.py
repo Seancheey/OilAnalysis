@@ -1,15 +1,35 @@
 from flask import Flask, render_template, request, flash, session
 from BackEnd.backend_api import *
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm.exc import DetachedInstanceError
+from BackEnd.objects import OilNews
+
 app = Flask(__name__)
 
+
+def dummienews():
+    res = []
+    for i in range(6):
+        n = OilNews(id=0, title="news"+str(i+1), content="This is displaying because the news API is not working. No."+str(i+1))
+        res.append(n)
+    return res
 
 @app.route('/')
 def homepage():
     username = None
+    news = get_oil_news()
+    if len(news) < 3:
+        news = dummienews()
+    try:
+        for n in news[:3]:
+            assert n.title
+            assert n.author
+            assert n.content
+    except DetachedInstanceError:
+        news = dummienews()
     if 'username' in session:
         username = session['username']
-    return render_template('index.html', username=username)
+    return render_template('index.html', username=username, news=news[:12])
 
 
 @app.route('/login', methods=['POST'])
@@ -31,7 +51,7 @@ def login_handler():
     if status:
         session['username'] = email
         session['token'] = status
-        return render_template('index.html', username=email)
+        return homepage()
     else:
         return render_template('index.html')
 
@@ -54,7 +74,7 @@ def register_handler():
     if status:
         session['username'] = email
         session['token'] = status
-        return render_template('index.html', username=email)
+        return homepage()
     else:
         return render_template('index.html')
 
