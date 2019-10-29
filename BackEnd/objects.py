@@ -18,6 +18,9 @@ class OilNews(Base):
     reference = Column(VARCHAR(300))
     retrieve_time = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
 
+    def __repr__(self):
+        return "OilNews(id=%d, title=%s)" % (self.id, self.title)
+
 
 class OilCategory(Base):
     __tablename__ = "oil_price_categories"
@@ -29,13 +32,13 @@ class OilIndex(Base):
     __tablename__ = "oil_price_indices"
     index_id = Column(INTEGER, primary_key=True, autoincrement=True)
     index_name = Column(VARCHAR(50), unique=True, nullable=False)
-    category_id = Column(INTEGER, ForeignKey("oil_price_categories.category_id"), nullable=True)
+    category_id = Column(INTEGER, ForeignKey("oil_price_categories.category_id", ondelete='CASCADE'), nullable=True)
 
 
 class OilPrice(Base):
     __tablename__ = "oil_prices"
     id = Column(INTEGER, primary_key=True, autoincrement=True)
-    index_id = Column(INTEGER, ForeignKey("oil_price_indices.index_id"), nullable=False)
+    index_id = Column(INTEGER, ForeignKey("oil_price_indices.index_id", ondelete='CASCADE'), nullable=False)
     price = Column(FLOAT, nullable=False)
     price_time = Column(DATETIME, nullable=False)
     retrieve_time = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
@@ -51,7 +54,7 @@ class OilStock(Base):
     __tablename__ = "oil_stocks"
     __tableargs__ = (UniqueConstraint("update_time", "stock_id"),)
     id = Column(INTEGER, primary_key=True, autoincrement=True)
-    stock_id = Column(INTEGER, ForeignKey("oil_stock_categories.stock_id"), nullable=False)
+    stock_id = Column(INTEGER, ForeignKey("oil_stock_categories.stock_id", ondelete='CASCADE'), nullable=False)
     volume = Column(FLOAT, nullable=False)
     update_time = Column(DATETIME, nullable=False, )
     retrieve_time = Column(TIMESTAMP, server_default=text('CURRENT_TIMESTAMP'))
@@ -67,7 +70,7 @@ class User(Base):
 class LoginSession(Base):
     __tablename__ = "login_sessions"
     session_token = Column(CHAR(16), primary_key=True)
-    username = Column(VARCHAR(32), ForeignKey("users.username"), nullable=False)
+    username = Column(VARCHAR(32), ForeignKey("users.username", ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     expiration_time = Column(TIMESTAMP, nullable=False)
 
 
@@ -75,5 +78,5 @@ class Comment(Base):
     __tablename__ = "comments"
     comment_id = Column(INTEGER, primary_key=True, autoincrement=True)
     news_id = Column(INTEGER, ForeignKey("oil_news.id"), nullable=False)
-    username = Column(VARCHAR(32), ForeignKey("users.username"), nullable=False)
+    username = Column(VARCHAR(32), ForeignKey("users.username", ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     text = Column(TEXT, nullable=False)
