@@ -32,7 +32,7 @@ def register(username: str, password_sha256: bytes, email: str):
     Should raise different errors if username/email already exists.
 
     :param username: required
-    :param password_sha256: required, SHA2-256 of the password
+    :param password_sha256: required, SHA3-256 of the password
     :param email: required
     """
     with new_session() as session:
@@ -43,6 +43,7 @@ def register(username: str, password_sha256: bytes, email: str):
         user = User(username=username, email=email, password=password_sha256)
         session.add(user)
         session.commit()
+        return True
 
 
 def login(username: str, password_sha256: bytes, expire_day_len: int = 30) -> str:
