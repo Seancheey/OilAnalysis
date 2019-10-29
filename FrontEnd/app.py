@@ -7,7 +7,7 @@ from BackEnd.objects import OilNews
 app = Flask(__name__)
 
 
-def dummienews():
+def dummynews():
     res = []
     for i in range(6):
         n = OilNews(id=0, title="news"+str(i+1), content="This is displaying because the news API is not working. No."+str(i+1))
@@ -18,15 +18,15 @@ def dummienews():
 def homepage():
     username = None
     news = get_oil_news()
-    if len(news) < 3:
-        news = dummienews()
+    if len(news) < 6:
+        news = dummynews()
     try:
         for n in news[:3]:
             assert n.title
             assert n.author
             assert n.content
     except DetachedInstanceError:
-        news = dummienews()
+        news = dummynews()
     if 'username' in session:
         username = session['username']
     return render_template('index.html', username=username, news=news[:12])
