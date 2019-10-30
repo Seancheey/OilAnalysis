@@ -1,6 +1,7 @@
 from BackEnd.errors import *
 from BackEnd.objects import *
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import or_
 from datetime import datetime, timedelta
 from random import choices
 from string import ascii_letters
@@ -11,7 +12,7 @@ __Session.configure(bind=engine)
 
 
 @contextmanager
-def new_session():
+def new_session() -> Session:
     """Provide a transactional scope around a series of operations."""
     session = __Session()
     try:
@@ -27,9 +28,9 @@ def new_session():
 def register(username: str, password_sha256: bytes, email: str):
     """
     >>> with new_session() as s:
-    ...     assert s.query(User).filter(User.username=='test_user').delete() >= 0
+    ...     assert s.query(User).filter(or_(User.username=='test_user', User.email=='test@test.com')).delete() >= 0
     ...     s.commit()
-    >>> register("test_user",b'abcdabcdabcdabcdabcdabcdabcdabcd', "adls371@outlook.com")
+    >>> register("test_user",b'abcdabcdabcdabcdabcdabcdabcdabcd', "test@test.com")
 
     new account registration.
     Should raise different errors if username/email already exists.
@@ -84,6 +85,48 @@ def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 
             raise UserDoNotExistsError()
 
 
+def logout(session_token: str):
+    """
+    >>> token = login("test_user",b'abcdabcdabcdabcdabcdabcdabcdabcd')
+    >>> logout(token)
+    >>> with new_session() as session:
+    ...     assert session.query(LoginSession).filter(LoginSession.session_token==token).count() == 0
+
+    logout user. Even if session is not found, no errors will be raised.
+    :param session_token: required
+    """
+    with new_session() as session:
+        session.query(LoginSession).filter(LoginSession.session_token == session_token).delete()
+
+
+def __get_login_session(sql_session: Session, session_token: str):
+    """
+    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd', expire_day_len=0)
+    >>> try:
+    ...     get_session_username(token)
+    ...     assert False, "login is supposed to expire"
+    ... except LoginSessionExpired:
+    ...     pass
+
+
+    helper function to raise Expire Error when token expired.
+    The function also delete the expired key.
+
+    :param sql_session: required. SQLAlchemy session
+    :param session_token: login token string
+    :return a login session object
+    """
+    token = sql_session.query(LoginSession).filter(LoginSession.session_token == session_token).one_or_none()
+    if token is None:
+        raise LoginSessionExpired()
+    if token.expiration_time < datetime.now():
+        sql_session.delete(token)
+        sql_session.commit()
+        raise LoginSessionExpired()
+    return LoginSession(session_token=token.session_token, username=token.username,
+                        expiration_time=token.expiration_time)
+
+
 def get_session_username(session_token: str) -> str:
     """
     >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd')
@@ -94,14 +137,8 @@ def get_session_username(session_token: str) -> str:
     :return: username for that session provided
     """
     with new_session() as session:
-        token = session.query(LoginSession).filter(LoginSession.session_token == session_token).one_or_none()
-        if token:
-            if token.expiration_time < datetime.now():
-                session.delete(token)
-                raise LoginSessionExpired()
-            return token.username
-        else:
-            raise LoginSessionExpired()
+        login_session = __get_login_session(session, session_token)
+        return login_session.username
 
 
 def comment(session_token: str, news_id: int, message: str):
@@ -117,15 +154,9 @@ def comment(session_token: str, news_id: int, message: str):
     :param message: required
     """
     with new_session() as session:
-        login_session = session.query(LoginSession).filter(LoginSession.session_token == session_token).one_or_none()
-        if login_session:
-            if login_session.expiration_time < datetime.now():
-                session.delete(login_session)
-            else:
-                session.add(Comment(news_id=news_id, username=login_session.username, text=message))
-                session.commit()
-        else:
-            raise LoginSessionExpired()
+        login_session = __get_login_session(session, session_token)
+        session.add(Comment(news_id=news_id, username=login_session.username, text=message))
+        session.commit()
 
 
 def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None) -> list:
