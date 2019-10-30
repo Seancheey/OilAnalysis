@@ -61,22 +61,18 @@ def register_handler():
     form = request.form
     # password is hashed on the client side
     email, password, username = form['email'], str.encode(form['password']), form['username']
-    status = None
     try:
         status = register(email, password, username)
+        session['username'] = email
+        session['token'] = status
+        return homepage()
     except UserAlreadyExistsError:
         flash("This email has been registered. Please login using that email.")
     except EmailAlreadyExistsError:
         flash("This username has been taken by someone else.")
     except OperationalError:
         flash("System operational error. Cannot connect to Database: Connection refused")
-
-    if status:
-        session['username'] = email
-        session['token'] = status
-        return homepage()
-    else:
-        return render_template('index.html')
+    return render_template('index.html')
 
 
 @app.route('/logout', methods=['POST'])
