@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from random import choices
 from string import ascii_letters
 from contextlib import contextmanager
+import pandas as pd
 
 __Session = sessionmaker()
 __Session.configure(bind=engine)
@@ -157,6 +158,23 @@ def comment(session_token: str, news_id: int, message: str):
         login_session = __get_login_session(session, session_token)
         session.add(Comment(news_id=news_id, username=login_session.username, text=message))
         session.commit()
+
+def pd_get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None):
+    """
+    get oil price within certain range (not required) and return as a pandas dataframe
+
+    :param oil_index: id of certain index name for oil, required
+    :param start_time: optional
+    :param end_time: optional
+    :return: pandas dataframe
+    """
+    with new_session() as session:
+        df = pd.read_sql(session.query(OilPrice).filter(OilPrice.index_id == oil_index).statement,session.bind)
+        if start_time:
+            result = result.filter(OilPrice.price_time > start_time)
+        if end_time:
+            result = result.filter(OilPrice.price_time < end_time)
+        return df
 
 
 def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None) -> list:

@@ -25,17 +25,49 @@ def dummienews():
 
 @app.route('/')
 def homepage():
-    # Generate random data to test if graph visualization works
+    # Grab the oil price data
+    oil_prices = get_oil_prices(1)
+    try:
+        for n in oil_prices:
+            assert n.id
+            assert n.index_id
+            assert n.price
+            assert n.price_time
+    except DetachedInstanceError:
+        # Generate random data to test if graph visualization works
+        rng = pd.date_range('1/1/2011', periods=7500, freq='H')
+        ts = pd.Series(np.random.randn(len(rng)), index=rng)
+        df = pd_get_oil_prices(1)
+        print(df)
+        # Definition of the graphs
+        graphs = [
+            dict(
+                data=[
+                    dict(
+                        x=ts.index,  # Can use the pandas data structures directly
+                        y=ts
+                    )
+                ]
+            )
+        ]
+
+        # Add "ids" to each of the graphs to pass up to the client for templating
+        ids = ['graph-{}'.format(i) for i, _ in enumerate(graphs)]
+
+        # Convert the figures to JSON
+        graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+
     rng = pd.date_range('1/1/2011', periods=7500, freq='H')
     ts = pd.Series(np.random.randn(len(rng)), index=rng)
-
+    df = pd_get_oil_prices(1)
+    print(df)
     # Definition of the graphs
     graphs = [
         dict(
             data=[
                 dict(
-                    x=ts.index,  # Can use the pandas data structures directly
-                    y=ts
+                    x=df["price_time"],  # Can use the pandas data structures directly
+                    y=df["price"]
                 )
             ]
         )
