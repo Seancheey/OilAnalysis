@@ -47,13 +47,32 @@ CREATE SCHEMA test;  # test database
 CREATE SCHEMA oil_analysis; # production database
 ```
 
+### Preparing python prerequisites
+
+at root of the project:
+
+```bash
+pip3 -r requirements.txt
+```
+
 #### Preparing tables:
 
-at root of project:
+at root of the project:
 
 ```
 python3 -m BackEnd.initialize_database
 ```
+
+#### Preparing data:
+
+In mysql console, type:
+```mysql
+source project/absolute/path/sample_data/news.sql
+source project/absolute/path/sample_data/oilprice1_category.sql
+source project/absolute/path/sample_data/oilprice2_indice.sql
+source project/absolute/path/sample_data/oilprice3.sql
+```
+
 
 Using BackEnd
 ---
@@ -64,3 +83,11 @@ Import API's by simply:
 from BackEnd import *
 ```
 
+Notes
+---
+
+By default, the code picks `oil_analysis` schema in engine, but during testing I recommend using `test` schema by going to `BackEnd.settings` and switch to 
+```
+engine = test_engine
+```
+to use test schema.
