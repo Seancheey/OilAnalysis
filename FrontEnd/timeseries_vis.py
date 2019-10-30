@@ -25,17 +25,16 @@ def dummienews():
 
 @app.route('/')
 def homepage():
-    # Generate random data to test if graph visualization works
-    rng = pd.date_range('1/1/2011', periods=7500, freq='H')
-    ts = pd.Series(np.random.randn(len(rng)), index=rng)
+    # Grab the oil price data
+    oil_prices = pd_get_oil_prices(1)
 
     # Definition of the graphs
     graphs = [
         dict(
             data=[
                 dict(
-                    x=ts.index,  # Can use the pandas data structures directly
-                    y=ts
+                    x=oil_prices["price_time"],  # Can use the pandas data structures directly
+                    y=oil_prices["price"]
                 )
             ]
         )
