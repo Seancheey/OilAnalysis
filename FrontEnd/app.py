@@ -5,7 +5,6 @@ from sqlalchemy.orm.exc import DetachedInstanceError
 from BackEnd.objects import OilNews
 import random
 
-
 import json
 import plotly
 
@@ -14,10 +13,12 @@ import numpy as np
 
 app = Flask(__name__)
 
+
 def dummynews():
     res = []
     for i in range(6):
-        n = OilNews(id=0, title="news"+str(i+1), content="This is displaying because the news API is not working. No."+str(i+1))
+        n = OilNews(id=0, title="news" + str(i + 1),
+                    content="This is displaying because the news API is not working. No." + str(i + 1))
         res.append(n)
     return res
 
@@ -61,6 +62,7 @@ def homepage():
     return render_template('temp_data_vis_playground.html', username=username, news=news[:12], ids=ids,
                            graphJSON=graphJSON)
 
+
 @app.route('/login', methods=['POST'])
 def login_handler():
     form = request.form
@@ -88,7 +90,7 @@ def login_handler():
 def register_handler():
     form = request.form
     # password is hashed on the client side
-    email, password, username = form['email'], bytes.fromhex(form['password']), form['username']
+    email, password, username = form['email'], str.encode(form['password'], 'utf-8'), form['username']
     try:
         register(username, password, email)
     except UserAlreadyExistsError:
