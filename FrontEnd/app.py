@@ -17,23 +17,42 @@ def dummynews():
 
 @app.route('/')
 def homepage():
+    # Grab the oil price data
+    oil_prices = pd_get_oil_prices(1)
+
+    # Definition of the graphs
+    graphs = [
+        dict(
+            data=[
+                dict(
+                    x=oil_prices["price_time"],  # Can use the pandas data structures directly
+                    y=oil_prices["price"]
+                )
+            ]
+        )
+    ]
+
+    # Add "ids" to each of the graphs to pass up to the client for templating
+    ids = ['graph-{}'.format(i) for i, _ in enumerate(graphs)]
+
+    # Convert the figures to JSON
+    graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
+
     username = None
     news = get_oil_news()
-    if len(news) < 6:
-        news = dummynews()
+    if len(news) < 3:
+        news = dummienews()
     try:
         for n in news[:3]:
             assert n.title
             assert n.author
             assert n.content
     except DetachedInstanceError:
-        news = dummynews()
+        news = dummienews()
     if 'username' in session:
         username = session['username']
-
-    news = random.sample(news, 9)
-    return render_template('index.html', username=username, news=news)
-
+    return render_template('temp_data_vis_playground.html', username=username, news=news[:12], ids=ids,
+                           graphJSON=graphJSON)
 
 @app.route('/login', methods=['POST'])
 def login_handler():
