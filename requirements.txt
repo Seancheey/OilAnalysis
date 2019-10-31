@@ -2,6 +2,6 @@ SQLAlchemy
 pymysql
 scrapy
 flask
-ploty
+plotly
 numpy
 pandas
