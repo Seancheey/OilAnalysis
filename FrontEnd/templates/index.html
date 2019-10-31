@@ -396,16 +396,16 @@
     <script>
       function mySubmit(obj) {
         var pwdObj = document.getElementById('pwd');
-        var hashObj = new jsSHA("SHA3-256", "TEXT", {numRounds: 1, encoding: "UTF16BE"});
+        var hashObj = new jsSHA("SHA3-256", "TEXT", {numRounds: 1, encoding: "UTF8"});
         hashObj.update(pwdObj.value);
-        var hash = hashObj.getHash("BYTES");
+        var hash = hashObj.getHash("HEX");
         pwdObj.value = hash;
       }
       function myRegister(obj) {
         var pwdObj = document.getElementById('pwd_2');
-        var hashObj = new jsSHA("SHA3-256", "TEXT", {numRounds: 1, encoding: "UTF16BE"});
+        var hashObj = new jsSHA("SHA3-256", "TEXT", {numRounds: 1, encoding: "UTF8"});
         hashObj.update(pwdObj.value);
-        var hash = hashObj.getHash("BYTES");
+        var hash = hashObj.getHash("HEX");
         pwdObj.value = hash;
       }
     </script>
