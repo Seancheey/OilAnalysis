@@ -4,8 +4,15 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import DetachedInstanceError
 from BackEnd.objects import OilNews
 import random
-app = Flask(__name__)
 
+
+import json
+import plotly
+
+import pandas as pd
+import numpy as np
+
+app = Flask(__name__)
 
 def dummynews():
     res = []
