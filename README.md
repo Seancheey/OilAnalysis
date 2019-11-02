@@ -43,7 +43,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'oil'@'localhost';
 
 In mysql console, type:
 ```mysql
-CREATE SCHEMA test;  # test database
+CREATE SCHEMA oil_analysis_test;  # test database
 CREATE SCHEMA oil_analysis; # production database
 ```
 
@@ -83,11 +83,3 @@ Import API's by simply:
 from BackEnd import *
 ```
 
-Notes
----
-
-By default, the code picks `oil_analysis` schema in engine, but during testing I recommend using `test` schema by going to `BackEnd.settings` and switch to 
-```
-engine = test_engine
-```
-to use test schema.

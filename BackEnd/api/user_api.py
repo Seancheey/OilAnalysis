@@ -1,30 +1,11 @@
-from BackEnd.errors import *
-from BackEnd.objects import *
-from BackEnd.settings import engine
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import or_
 from datetime import datetime, timedelta
 from random import choices
 from string import ascii_letters
-from contextlib import contextmanager
-import pandas as pd
 
-__Session = sessionmaker()
-__Session.configure(bind=engine)
-
-
-@contextmanager
-def new_session() -> Session:
-    """Provide a transactional scope around a series of operations."""
-    session = __Session()
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
-    finally:
-        session.close()
+from BackEnd.api.utils import new_session, get_login_session
+from BackEnd.errors import UserAlreadyExistsError, EmailAlreadyExistsError, UserPasswordNoMatchError, \
+    UserDoNotExistsError
+from BackEnd.objects import User, LoginSession, Comment
 
 
 def register(username: str, password_sha256: bytes, email: str):
@@ -101,34 +82,6 @@ def logout(session_token: str):
         session.query(LoginSession).filter(LoginSession.session_token == session_token).delete()
 
 
-def __get_login_session(sql_session: Session, session_token: str):
-    """
-    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd', expire_day_len=-1)
-    >>> try:
-    ...     get_session_username(token)
-    ...     assert False, "login is supposed to expire"
-    ... except LoginSessionExpired:
-    ...     pass
-
-
-    helper function to raise Expire Error when token expired.
-    The function also delete the expired key.
-
-    :param sql_session: required. SQLAlchemy session
-    :param session_token: login token string
-    :return a login session object
-    """
-    token = sql_session.query(LoginSession).filter(LoginSession.session_token == session_token).one_or_none()
-    if token is None:
-        raise LoginSessionExpired()
-    if token.expiration_time < datetime.now():
-        sql_session.delete(token)
-        sql_session.commit()
-        raise LoginSessionExpired()
-    return LoginSession(session_token=token.session_token, username=token.username,
-                        expiration_time=token.expiration_time)
-
-
 def get_session_username(session_token: str) -> str:
     """
     >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd')
@@ -139,7 +92,7 @@ def get_session_username(session_token: str) -> str:
     :return: username for that session provided
     """
     with new_session() as session:
-        login_session = __get_login_session(session, session_token)
+        login_session = get_login_session(session, session_token)
         return login_session.username
 
 
@@ -157,68 +110,6 @@ def comment(session_token: str, target_id: int, message: str, comment_type: Comm
     :param message: required
     """
     with new_session() as session:
-        login_session = __get_login_session(session, session_token)
+        login_session = get_login_session(session, session_token)
         session.add(comment_type(target_id=target_id, username=login_session.username, text=message))
         session.commit()
-
-
-def pd_get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None):
-    """
-    get oil price within certain range (not required) and return as a pandas dataframe
-
-    :param oil_index: id of certain index name for oil, required
-    :param start_time: optional
-    :param end_time: optional
-    :return: pandas dataframe
-    """
-    with new_session() as session:
-        df = pd.read_sql(session.query(OilPrice).filter(OilPrice.index_id == oil_index).statement, session.bind)
-        if start_time:
-            result = result.filter(OilPrice.price_time > start_time)
-        if end_time:
-            result = result.filter(OilPrice.price_time < end_time)
-        return df
-
-
-def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None) -> list:
-    """
-    get oil price within certain range (not required) for certain type
-
-    :param oil_index: id of certain index name for oil, required
-    :param start_time: optional
-    :param end_time: optional
-    :return: list of oil price objects
-    """
-    with new_session() as session:
-        result = session.query(OilPrice).filter(OilPrice.index_id == oil_index)
-        if start_time:
-            result = result.filter(OilPrice.price_time > start_time)
-        if end_time:
-            result = result.filter(OilPrice.price_time < end_time)
-        return [
-            OilPrice(price_id=price.price_id, index_id=price.index_id, price=price.price, price_time=price.price_time)
-            for price
-            in result]
-
-
-def get_oil_news(start_time: datetime = None, end_time: datetime = None, news_num: int = -1) -> list:
-    """
-    >>> get_oil_news(start_time=datetime(year=2018,month=9,day=20)) is not None
-    True
-
-    get oil news within certain range of time. (not required)
-
-    :param start_time: optional
-    :param end_time: optional
-    :param news_num: required, number of news to grab each time, anything < 0 means grab all
-    :return: list of oil news objects
-    """
-    with new_session() as session:
-        result = session.query(OilNews).order_by(OilNews.publish_date)
-        if start_time:
-            result = result.filter(OilNews.publish_date > start_time)
-        if end_time:
-            result = result.filter(OilNews.publish_date < end_time)
-        return [OilNews(news_id=news.news_id, title=news.title, publish_date=news.publish_date, author=news.author,
-                        content=news.content, reference=news.reference, retrieve_time=news.retrieve_time) for news in
-                result]

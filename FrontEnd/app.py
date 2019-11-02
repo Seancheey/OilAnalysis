@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, session, redirect
-from BackEnd.backend_api import *
+from BackEnd import *
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import DetachedInstanceError
 from BackEnd.objects import OilNews
@@ -14,10 +14,10 @@ import numpy as np
 app = Flask(__name__)
 
 
-def dummynews():
+def dummy_news():
     res = []
     for i in range(6):
-        n = OilNews(id=0, title="news" + str(i + 1),
+        n = OilNews(news_id=0, title="news" + str(i + 1),
                     content="This is displaying because the news API is not working. No." + str(i + 1))
         res.append(n)
     return res
@@ -49,14 +49,14 @@ def homepage():
     username = None
     news = get_oil_news()
     if len(news) < 3:
-        news = dummynews()
+        news = dummy_news()
     try:
         for n in news[:3]:
             assert n.title
             assert n.author
             assert n.content
     except DetachedInstanceError:
-        news = dummynews()
+        news = dummy_news()
     if 'username' in session:
         username = session['username']
     return render_template('index.html', username=username, news=news[:12], ids=ids,
