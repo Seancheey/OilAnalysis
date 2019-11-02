@@ -54,7 +54,7 @@ class LoginSession(Base):
     session_token = Column(CHAR(16), primary_key=True)
     username = Column(VARCHAR(32), ForeignKey("users.username", ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     login_time = Column(TIMESTAMP, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
-    expiration_time = Column(TIMESTAMP, nullable=False)
+    expiration_time = Column(TIMESTAMP, nullable=True)
     device_name = Column(VARCHAR(64), nullable=True)
 
 
