@@ -49,14 +49,14 @@ def homepage():
     username = None
     news = get_oil_news()
     if len(news) < 3:
-        news = dummienews()
+        news = dummynews()
     try:
         for n in news[:3]:
             assert n.title
             assert n.author
             assert n.content
     except DetachedInstanceError:
-        news = dummienews()
+        news = dummynews()
     if 'username' in session:
         username = session['username']
     return render_template('temp_data_vis_playground.html', username=username, news=news[:12], ids=ids,
@@ -115,4 +115,4 @@ def logout_handler():
 
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
-    app.run()
+    app.run(host='0.0.0.0')
