@@ -33,7 +33,7 @@ skipped
 
 #### Preparing MySQL user:
 
-In mysql console, type: (usually accessed by `mysql -uroot`)
+In mysql console, type: (usually accessed by `mysql -uroot -p`)
 ```mysql
 CREATE USER 'oil'@'localhost' IDENTIFIED BY 'h1VHhQWour';
 GRANT ALL PRIVILEGES ON *.* TO 'oil'@'localhost';
@@ -52,7 +52,7 @@ CREATE SCHEMA oil_analysis; # production database
 at root of the project:
 
 ```bash
-pip3 -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 #### Preparing tables:
