@@ -5,14 +5,22 @@ This project includes a comprehensive platform for providing oil information fro
 
 The project can be mainly devided into 4 parts:
 1. Data collection
-2. Database Back End
-3. Web Front End
-4. Information clustering and regression
+2. Database
+3. Flask back end + price analysis
+3. Web-based front end
 
 Prerequisite
 ---
-Python 3.6 or above
+1. Python 3.6 or above
+2. MySQL
 
+Optional for web deployment:
+1. Apache
+2. [Flask WSGI](http://flask.palletsprojects.com/en/1.1.x/deploying/mod_wsgi/) 
+
+Recommended Software for development:
+1. PyCharm
+2. DataGrip
 
 Installation
 ---
@@ -74,10 +82,10 @@ source project/absolute/path/sample_data/oilprice3.sql
 ```
 
 
-Using BackEnd
+Using BackEnd API
 ---
 
-Import API's by simply:
+api package and errors package are automatically included when doing:
 
 ```python
 from BackEnd import *
