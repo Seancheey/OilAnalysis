@@ -1,5 +1,6 @@
 from BackEnd.errors import *
 from BackEnd.objects import *
+from BackEnd.settings import engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import or_
 from datetime import datetime, timedelta
@@ -102,7 +103,7 @@ def logout(session_token: str):
 
 def __get_login_session(sql_session: Session, session_token: str):
     """
-    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd', expire_day_len=0)
+    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd', expire_day_len=-1)
     >>> try:
     ...     get_session_username(token)
     ...     assert False, "login is supposed to expire"
@@ -142,22 +143,24 @@ def get_session_username(session_token: str) -> str:
         return login_session.username
 
 
-def comment(session_token: str, news_id: int, message: str):
+def comment(session_token: str, target_id: int, message: str, comment_type: Comment.__class__):
     """
     >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd')
-    >>> comment(token, 1, 'test message')
+    >>> comment(token, 1, 'test message', NewsComment)
 
     logged-in user comment on certain news
     Should check token expiration and raise error if it does.
 
-    :param session_token: required
-    :param news_id: required
+    :param session_token: required, session token of user
+    :param comment_type: required, should be one of following:
+    :param target_id: required, target id
     :param message: required
     """
     with new_session() as session:
         login_session = __get_login_session(session, session_token)
-        session.add(Comment(news_id=news_id, username=login_session.username, text=message))
+        session.add(comment_type(target_id=target_id, username=login_session.username, text=message))
         session.commit()
+
 
 def pd_get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None):
     """
@@ -169,7 +172,7 @@ def pd_get_oil_prices(oil_index: int, start_time: datetime = None, end_time: dat
     :return: pandas dataframe
     """
     with new_session() as session:
-        df = pd.read_sql(session.query(OilPrice).filter(OilPrice.index_id == oil_index).statement,session.bind)
+        df = pd.read_sql(session.query(OilPrice).filter(OilPrice.index_id == oil_index).statement, session.bind)
         if start_time:
             result = result.filter(OilPrice.price_time > start_time)
         if end_time:
@@ -192,8 +195,10 @@ def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: dateti
             result = result.filter(OilPrice.price_time > start_time)
         if end_time:
             result = result.filter(OilPrice.price_time < end_time)
-        return [OilPrice(id=price.id, index_id=price.index_id, price=price.price, price_time=price.price_time) for price
-                in result]
+        return [
+            OilPrice(price_id=price.price_id, index_id=price.index_id, price=price.price, price_time=price.price_time)
+            for price
+            in result]
 
 
 def get_oil_news(start_time: datetime = None, end_time: datetime = None, news_num: int = -1) -> list:
@@ -214,6 +219,6 @@ def get_oil_news(start_time: datetime = None, end_time: datetime = None, news_nu
             result = result.filter(OilNews.publish_date > start_time)
         if end_time:
             result = result.filter(OilNews.publish_date < end_time)
-        return [OilNews(id=news.id, title=news.title, publish_date=news.publish_date, author=news.author,
+        return [OilNews(news_id=news.news_id, title=news.title, publish_date=news.publish_date, author=news.author,
                         content=news.content, reference=news.reference, retrieve_time=news.retrieve_time) for news in
                 result]
