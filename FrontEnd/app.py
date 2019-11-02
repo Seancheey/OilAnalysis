@@ -59,7 +59,7 @@ def homepage():
         news = dummynews()
     if 'username' in session:
         username = session['username']
-    return render_template('temp_data_vis_playground.html', username=username, news=news[:12], ids=ids,
+    return render_template('index.html', username=username, news=news[:12], ids=ids,
                            graphJSON=graphJSON)
 
 
@@ -78,7 +78,6 @@ def login_handler():
     except OperationalError:
         flash("System operational error. Cannot connect to Database: Connection refused")
 
-    # TODO - Also need username.
     if status:
         session['username'] = email
         session['email'] = email
@@ -90,7 +89,7 @@ def login_handler():
 def register_handler():
     form = request.form
     # password is hashed on the client side
-    email, password, username = form['email'], str.encode(form['password'], 'utf-8'), form['username']
+    email, password, username = form['email'], bytes.fromhex(form['password']), form['username']
     try:
         register(username, password, email)
     except UserAlreadyExistsError:
