@@ -5,14 +5,22 @@ This project includes a comprehensive platform for providing oil information fro
 
 The project can be mainly devided into 4 parts:
 1. Data collection
-2. Database Back End
-3. Web Front End
-4. Information clustering and regression
+2. Database
+3. Flask back end + price analysis
+3. Web-based front end
 
 Prerequisite
 ---
-Python 3.6 or above
+1. Python 3.6 or above
+2. MySQL
 
+Optional for web deployment:
+1. Apache
+2. [Flask WSGI](http://flask.palletsprojects.com/en/1.1.x/deploying/mod_wsgi/) 
+
+Recommended Software for development:
+1. PyCharm
+2. DataGrip
 
 Installation
 ---
@@ -33,7 +41,7 @@ skipped
 
 #### Preparing MySQL user:
 
-In mysql console, type: (usually accessed by `mysql -uroot`)
+In mysql console, type: (usually accessed by `mysql -uroot -p`)
 ```mysql
 CREATE USER 'oil'@'localhost' IDENTIFIED BY 'h1VHhQWour';
 GRANT ALL PRIVILEGES ON *.* TO 'oil'@'localhost';
@@ -43,7 +51,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'oil'@'localhost';
 
 In mysql console, type:
 ```mysql
-CREATE SCHEMA test;  # test database
+CREATE SCHEMA oil_analysis_test;  # test database
 CREATE SCHEMA oil_analysis; # production database
 ```
 
@@ -52,7 +60,7 @@ CREATE SCHEMA oil_analysis; # production database
 at root of the project:
 
 ```bash
-pip3 -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 #### Preparing tables:
@@ -74,20 +82,12 @@ source project/absolute/path/sample_data/oilprice3.sql
 ```
 
 
-Using BackEnd
+Using BackEnd API
 ---
 
-Import API's by simply:
+api package and errors package are automatically included when doing:
 
 ```python
 from BackEnd import *
 ```
 
-Notes
----
-
-By default, the code picks `oil_analysis` schema in engine, but during testing I recommend using `test` schema by going to `BackEnd.settings` and switch to 
-```
-engine = test_engine
-```
-to use test schema.
