@@ -10,11 +10,6 @@ from BackEnd.objects import User, LoginSession
 
 def register(username: str, password_sha256: bytes, email: str):
     """
-    >>> with new_session() as s:
-    ...     assert s.query(User).filter(or_(User.username=='test_user', User.email=='test@test.com')).delete() >= 0
-    ...     s.commit()
-    >>> register("test_user",b'abcdabcdabcdabcdabcdabcdabcdabcd', "test@test.com")
-
     new account registration.
     Should raise different errors if username/email already exists.
 
@@ -34,10 +29,6 @@ def register(username: str, password_sha256: bytes, email: str):
 
 def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 30) -> str:
     """
-    >>> with new_session() as session:
-    ...     assert session.query(LoginSession).filter(LoginSession.username=='test_user').delete() >= 0
-    >>> assert len(login("test_user", b'abcdabcdabcdabcdabcdabcdabcdabcd')) > 0
-
     make an existing user login. Return a new session id which has an expiration date.
     Should raise errors when user not exists or username and password doesn't match
 
@@ -73,11 +64,6 @@ def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 
 
 def logout(session_token: str):
     """
-    >>> token = login("test_user",b'abcdabcdabcdabcdabcdabcdabcdabcd')
-    >>> logout(token)
-    >>> with new_session() as session:
-    ...     assert session.query(LoginSession).filter(LoginSession.session_token==token).count() == 0
-
     logout user. Even if session is not found, no errors will be raised.
     :param session_token: required
     """
@@ -87,10 +73,6 @@ def logout(session_token: str):
 
 def get_session_username(session_token: str) -> str:
     """
-    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd')
-    >>> get_session_username(token)
-    'test_user'
-
     :param session_token: required
     :return: username for that session provided
     """
