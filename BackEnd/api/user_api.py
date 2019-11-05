@@ -4,8 +4,8 @@ from string import ascii_letters
 
 from BackEnd.api.utils import new_session, get_login_session
 from BackEnd.errors import UserAlreadyExistsError, EmailAlreadyExistsError, UserPasswordNoMatchError, \
-    UserDoNotExistsError
-from BackEnd.objects import User, LoginSession, Comment
+    UsernameDoNotExistsError, EmailDoNotExistsError
+from BackEnd.objects import User, LoginSession
 
 
 def register(username: str, password_sha256: bytes, email: str):
@@ -65,7 +65,10 @@ def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 
             # when query returns 0 users, see if user password is incorrect or user doesn't exists
             for _ in session.query(User).filter(User.username == username_or_email):
                 raise UserPasswordNoMatchError()
-            raise UserDoNotExistsError()
+            if '@' in username_or_email:
+                raise EmailDoNotExistsError
+            else:
+                raise UsernameDoNotExistsError
 
 
 def logout(session_token: str):
@@ -94,22 +97,3 @@ def get_session_username(session_token: str) -> str:
     with new_session() as session:
         login_session = get_login_session(session, session_token)
         return login_session.username
-
-
-def comment(session_token: str, target_id: int, message: str, comment_type: Comment.__class__):
-    """
-    >>> token = login('test_user', b'abcdabcdabcdabcdabcdabcdabcdabcd')
-    >>> comment(token, 1, 'test message', NewsComment)
-
-    logged-in user comment on certain news
-    Should check token expiration and raise error if it does.
-
-    :param session_token: required, session token of user
-    :param comment_type: required, should be one of following:
-    :param target_id: required, target id
-    :param message: required
-    """
-    with new_session() as session:
-        login_session = get_login_session(session, session_token)
-        session.add(comment_type(target_id=target_id, username=login_session.username, text=message))
-        session.commit()

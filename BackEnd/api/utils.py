@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from BackEnd.errors import LoginSessionExpired
+from BackEnd.errors import *
 from BackEnd.objects import LoginSession
 from BackEnd.settings import engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -13,7 +13,7 @@ __Session.configure(bind=engine)
 @contextmanager
 def new_session() -> Session:
     """Provide a transactional scope around a series of operations."""
-    session = __Session()
+    session: Session = __Session()
     try:
         yield session
         session.commit()

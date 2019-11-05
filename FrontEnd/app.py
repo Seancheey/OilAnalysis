@@ -73,7 +73,9 @@ def login_handler():
         status = login(email, password)
     except UserPasswordNoMatchError:
         flash("Password does not match in our database.")
-    except UserDoNotExistsError:
+    except UsernameDoNotExistsError:
+        flash("The account does not exist in our database.")
+    except EmailDoNotExistsError:
         flash("The account does not exist in our database.")
     except OperationalError:
         flash("System operational error. Cannot connect to Database: Connection refused")
