@@ -47,7 +47,7 @@ def homepage():
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
 
     username = None
-    news = get_oil_news()
+    news = get_oil_news_list()
     if len(news) < 3:
         news = dummy_news()
     try:
