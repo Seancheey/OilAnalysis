@@ -39,11 +39,9 @@ def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 
     """
     with new_session() as session:
         result = session.query(User)
-        # automatically figure out if input is username or email
-        if '@' in username_or_email:
-            result = result.filter(User.email == username_or_email, User.password == password_sha256)
-        else:
-            result = result.filter(User.username == username_or_email, User.password == password_sha256)
+        # figure out if input is username or email
+        col_to_match = User.email if ('@' in username_or_email and '.' in username_or_email) else User.username
+        result = result.filter(col_to_match == username_or_email, User.password == password_sha256)
         user = result.one_or_none()
         if user:
             # generate session token
@@ -54,12 +52,9 @@ def login(username_or_email: str, password_sha256: bytes, expire_day_len: int = 
             return raw
         else:
             # when query returns 0 users, see if user password is incorrect or user doesn't exists
-            for _ in session.query(User).filter(User.username == username_or_email):
+            for _ in session.query(User).filter(col_to_match == username_or_email):
                 raise UserPasswordNoMatchError()
-            if '@' in username_or_email:
-                raise EmailDoNotExistsError
-            else:
-                raise UsernameDoNotExistsError
+            raise EmailDoNotExistsError if col_to_match is User.email else UsernameDoNotExistsError
 
 
 def logout(session_token: str):
