@@ -50,13 +50,10 @@ def homepage():
     news = get_oil_news_list()
     if len(news) < 3:
         news = dummy_news()
-    try:
-        for n in news[:3]:
-            assert n.title
-            assert n.author
-            assert n.content
-    except DetachedInstanceError:
-        news = dummy_news()
+    for n in news[:3]:
+        assert n.title
+        assert n.author
+        assert n.content
     if 'username' in session:
         username = session['username']
     return render_template('index.html', username=username, news=news[:12], ids=ids,
