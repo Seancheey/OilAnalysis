@@ -4,6 +4,8 @@ from BackEnd import *
 test_username = 'random_test'
 test_email = 'random_test@test.com'
 test_pass = b'abcdabcdabcdabcdabcdabcdabcdabcd'
+test_title = 'Test Title'
+test_date = datetime.now()
 
 
 @contextmanager
@@ -29,13 +31,15 @@ def temp_login_session(username=test_username, password=test_pass, expire=30):
 @contextmanager
 def temp_news():
     try:
-        news = OilNews(title='Test Title', publish_date=datetime.today(), author='Qiyi Shan', content='YOLO!',
+        news = OilNews(title=test_title, publish_date=test_date, author='Qiyi Shan', content='YOLO!',
                        reference='')
         with new_session() as session:
             session.add(news)
+            session.commit()
+            yield session.query(OilNews).filter(OilNews.title == test_title).limit(1).one_or_none()
     finally:
         with new_session() as session:
-            session.query
+            session.query(OilNews).filter(OilNews.title == test_title, OilNews.publish_date == test_date).delete()
 
 
 class MyTestCase(unittest.TestCase):
@@ -77,6 +81,13 @@ class MyTestCase(unittest.TestCase):
                 logout(token)
                 with new_session() as session:
                     self.assertEqual(session.query(LoginSession).filter(LoginSession.session_token == token).count(), 0)
+
+    def test_news(self):
+        get_oil_news_list(news_num=5)
+        self.assertEqual(len(get_oil_news_list(start_time=datetime.now())), 0)
+        with temp_news() as news:
+            self.assertEqual(len(get_oil_news_list(news_num=1)), 1)
+            self.assertEqual(get_latest_news().title, news.title)
 
     def test_comment(self):
         pass
