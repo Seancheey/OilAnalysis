@@ -74,3 +74,13 @@ def get_session_username(session_token: str) -> str:
     with new_session() as session:
         login_session = get_login_session(session, session_token)
         return login_session.username
+
+
+def change_password(username_or_email: str, current_pass_sha256: bytes, new_pass_sha256: bytes):
+    """
+    Change password of of a user. Should raise error if password doesn't match or user/email doesn't exists
+    :param username_or_email: required
+    :param current_pass_sha256: required
+    :param new_pass_sha256: required
+    """
+    pass
