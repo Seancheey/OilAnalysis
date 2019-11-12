@@ -33,6 +33,22 @@ class OilIndex(Base):
     category_id = Column(INTEGER, ForeignKey("oil_price_categories.category_id", ondelete='CASCADE'), nullable=True)
 
 
+class OilIndexDenormalized:
+    index_id: int
+    index_name: str
+    category_id: int
+    category_name: str
+
+    def __init__(self, iid: int, iname: str, cid: int, cname: str):
+        self.index_id = iid
+        self.index_name = iname
+        self.category_id = cid
+        self.category_name = cname
+
+    def __str__(self):
+        return vars(self).__str__()
+
+
 class OilPrice(Base):
     __tablename__ = "oil_prices"
     price_id = Column(INTEGER, primary_key=True, autoincrement=True)

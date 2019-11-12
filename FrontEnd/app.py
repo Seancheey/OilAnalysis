@@ -47,16 +47,13 @@ def homepage():
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
 
     username = None
-    news = get_oil_news()
+    news = get_oil_news_list()
     if len(news) < 3:
         news = dummy_news()
-    try:
-        for n in news[:3]:
-            assert n.title
-            assert n.author
-            assert n.content
-    except DetachedInstanceError:
-        news = dummy_news()
+    for n in news[:3]:
+        assert n.title
+        assert n.author
+        assert n.content
     if 'username' in session:
         username = session['username']
     return render_template('index.html', username=username, news=news[:12], ids=ids,
@@ -73,7 +70,9 @@ def login_handler():
         status = login(email, password)
     except UserPasswordNoMatchError:
         flash("Password does not match in our database.")
-    except UserDoNotExistsError:
+    except UsernameDoNotExistsError:
+        flash("The account does not exist in our database.")
+    except EmailDoNotExistsError:
         flash("The account does not exist in our database.")
     except OperationalError:
         flash("System operational error. Cannot connect to Database: Connection refused")
