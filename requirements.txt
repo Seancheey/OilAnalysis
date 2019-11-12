@@ -5,3 +5,4 @@ flask
 plotly
 numpy
 pandas
+keras
