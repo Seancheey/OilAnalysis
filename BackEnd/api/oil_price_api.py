@@ -2,6 +2,7 @@ from BackEnd.objects import *
 from BackEnd.api.utils import new_session
 from datetime import datetime
 import pandas as pd
+from typing import List
 
 
 def pd_get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None):
@@ -15,14 +16,10 @@ def pd_get_oil_prices(oil_index: int, start_time: datetime = None, end_time: dat
     """
     with new_session() as session:
         df = pd.read_sql(session.query(OilPrice).filter(OilPrice.index_id == oil_index).statement, session.bind)
-        if start_time:
-            result = result.filter(OilPrice.price_time > start_time)
-        if end_time:
-            result = result.filter(OilPrice.price_time < end_time)
         return df
 
 
-def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None) -> list:
+def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: datetime = None) -> List[OilPrice]:
     """
     get oil price within certain range (not required) for certain type
 
@@ -43,3 +40,13 @@ def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: dateti
             in result]
 
 
+def get_oil_indices() -> List[OilIndexDenormalized]:
+    """
+    get all de-normalized oil indices
+    :return: list of oil indices objects
+    """
+    with new_session() as session:
+        result = session.query(OilIndex, OilCategory).filter(OilIndex.category_id == OilCategory.category_id).order_by(
+            OilIndex.index_id)
+        return [OilIndexDenormalized(iid=i.index_id, iname=i.index_name, cid=c.category_id, cname=c.category_name) for
+                i, c in result]
