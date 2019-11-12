@@ -15,7 +15,13 @@ def pd_get_oil_prices(oil_index: int, start_time: datetime = None, end_time: dat
     :return: pandas dataframe
     """
     with new_session() as session:
-        df = pd.read_sql(session.query(OilPrice).filter(OilPrice.index_id == oil_index).statement, session.bind)
+        result = session.query(OilPrice).filter(OilPrice.index_id == oil_index)
+        if start_time:
+            result = result.filter(OilPrice.price_time > start_time)
+        if end_time:
+            result = result.filter(OilPrice.price_time < end_time)
+        result = result.order_by(OilPrice.price_time)
+        df = pd.read_sql(result.statement, session.bind)
         return df
 
 
@@ -34,6 +40,7 @@ def get_oil_prices(oil_index: int, start_time: datetime = None, end_time: dateti
             result = result.filter(OilPrice.price_time > start_time)
         if end_time:
             result = result.filter(OilPrice.price_time < end_time)
+        result = result.order_by(OilPrice.price_time).all()
         return [
             OilPrice(price_id=price.price_id, index_id=price.index_id, price=price.price, price_time=price.price_time)
             for price
