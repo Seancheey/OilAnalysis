@@ -48,4 +48,4 @@ def get_latest_news() -> OilNews:
     :return: OilNews object
     """
     with new_session() as session:
-        return __wrap_oil_news(session.query(OilNews).order_by(OilNews.publish_date).limit(1).one_or_none())
+        return __wrap_oil_news(session.query(OilNews).order_by(OilNews.publish_date.desc()).limit(1).one_or_none())
