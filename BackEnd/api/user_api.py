@@ -83,4 +83,17 @@ def change_password(username_or_email: str, current_pass_sha256: bytes, new_pass
     :param current_pass_sha256: required
     :param new_pass_sha256: required
     """
-    pass
+    with new_session() as session:
+        result=session.query(User)
+        #figure out username or email
+        col_to_match = User.email if ('@' in username_or_email and '.' in username_or_email) else User.username
+        result = result.filter(col_to_match == username_or_email, User.password == current_pass_sha256)
+        user = result.one_or_none()
+        if not user:
+            for _ in session.query(User).filter(col_to_match == username_or_email):
+                raise UserPasswordNoMatchError()
+            raise EmailDoNotExistsError if col_to_match is User.email else UsernameDoNotExistsError
+        else:
+            result.update({User.password:new_pass_sha256})
+
+
