@@ -56,8 +56,11 @@ def homepage():
         assert n.content
     if 'username' in session:
         username = session['username']
-    return render_template('index.html', username=username, news=news[:12], ids=ids,
-                           graphJSON=graphJSON)
+    twitters = ['WtiOil', 'CrudeOilBrokers', 'TullowOilplc', 'OilPriceHourly', 'OilPriceUpdate',
+                'oilpricebot', 'oilandgasprice', 'theoilprice', 'OPIS', 'OilandEnergy']
+    random.shuffle(twitters)
+    return render_template('index.html', username=username, news=news[:9], ids=ids,
+                           graphJSON=graphJSON, twitters=twitters)
 
 
 @app.route('/login', methods=['POST'])
