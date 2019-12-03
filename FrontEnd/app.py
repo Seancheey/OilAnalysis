@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 
 app = Flask(__name__)
-
+news = None
 
 def dummy_news():
     res = []
@@ -47,6 +47,7 @@ def homepage():
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
 
     username = None
+    global news
     news = get_oil_news_list()
     if len(news) < 3:
         news = dummy_news()
@@ -112,6 +113,23 @@ def register_handler():
 def logout_handler():
     session.clear()
     return redirect("/")
+
+
+@app.route('/news/<int:news_id>')
+def news_display(news_id):
+    try:
+        this_news = news[news_id]
+    except TypeError:
+        return redirect('/')
+
+    try:
+        username = session['username']
+    except KeyError:
+        # User is not logged in
+        username = None
+    return render_template('news.html', username=username, title=this_news.title,
+                           author=this_news.author, data=this_news.publish_date,
+                           content=this_news.content)
 
 
 if __name__ == "__main__":
