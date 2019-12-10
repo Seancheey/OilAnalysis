@@ -138,6 +138,12 @@ def news_display(news_id):
                            content=this_news.content, ref=this_news.reference, recommendation=recom)
 
 
+@app.route('/news/comments', methods=['POST'])
+def submit_comment():
+    form = request.form
+    comment = form['comment']
+
+
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
     app.run(host='0.0.0.0')

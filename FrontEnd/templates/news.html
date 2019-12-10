@@ -196,24 +196,45 @@
   </div>
   <main role="main" class="container">
     <div class="row">
-    <div class="col-md-8 blog-post">
+      <div class="col-md-8 blog-main">
+    <div class="blog-post">
         <h2 class="blog-post-title">{{title}}</h2>
         <p class="blog-post-meta">{{date}} by <a href="#">{{author}}</a></p>
 
         <p>{{content}}</p>
-    </div>
+      </div>
+      <div class="blog-pagination">
+        <h3 class="blog-post"> Comments in Community</h3>
+        <a class="btn btn-outline-secondary disabled" >This is a comment 1</a>
+        <a class="btn btn-outline-primary disabled" >This is a comment 2</a>
+        <a class="btn btn-outline-danger disabled" >This is a comment 3</a>
+      </div>
+        <div class="blog-post">
+          <form action="{{ url_for('submit_comment') }}" method="post">
+            <label for="comment" class="blog-post-title">Leave yours here</label>
+            {% if username %}
+            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+            <div class="text-center form-sm mt-2">
+              <button type="submit" class="btn btn-info waves-effect waves-light">Submit</button>
+            </div>
+            {% else %}
+            <p> Please login first</p>
+            {% endif %}
+          </form>
+        </div>
+      </div>
     <aside class="col-md-4 blog-sidebar">
           <div class="p-3 mb-3 bg-light rounded">
             <h4 class="font-italic">Sentiment Analysis</h4>
             <p class="mb-0">This is somehow negative to the oil market. A new energy not oil is getting popular.</p>
           </div>
 
-          <div class="p-3 mb-3">
-            <h4 class="font-italic">Trending on Social</h4>
-            <ol class="list-unstyled">
-              <li><a href="https://github.com/topics/oil-price">GitHub</a></li>
-              <li><a href="https://twitter.com/hashtag/oilprice?lang=en">Twitter</a></li>
-              <li><a href="https://www.facebook.com/oilpricenews/">Facebook</a></li>
+           <div class="p-3 mb-3 rounded">
+            <h4 class="font-italic">Other interesting news</h4>
+            <ol class="list-group-item-light">
+              <li><a href="{{ url_for('news_display', news_id=recommendation[0].news_id ) }}">{{recommendation[0].title}}</a></li>
+              <li><a href="{{ url_for('news_display', news_id=recommendation[1].news_id) }}">{{recommendation[1].title}}</a></li>
+              <li><a href="{{ url_for('news_display', news_id=recommendation[2].news_id) }}">{{recommendation[2].title}}</a></li>
             </ol>
           </div>
 
@@ -222,18 +243,26 @@
             <a href="{{ref}}">Click here for original source</a>
           </div>
 
-      <div class="p-3 mb-3 rounded">
-            <h4 class="font-italic">You might be interested in...</h4>
+      <div class="p-3 mb-3">
+            <h4 class="font-italic">Trending on social</h4>
             <ol class="list-unstyled">
-              <li><a href="{{ url_for('news_display', news_id=recommendation[0].news_id ) }}">{{recommendation[0].title}}</a></li>
-              <li><a href="{{ url_for('news_display', news_id=recommendation[1].news_id) }}">{{recommendation[1].title}}</a></li>
-              <li><a href="{{ url_for('news_display', news_id=recommendation[2].news_id) }}">{{recommendation[2].title}}</a></li>
+              <li><a href="https://github.com/topics/oil-price">GitHub</a></li>
+              <li><a href="https://twitter.com/hashtag/oilprice?lang=en">Twitter</a></li>
+              <li><a href="https://www.facebook.com/oilpricenews/">Facebook</a></li>
             </ol>
           </div>
+
+
         </aside>
     </div>
   </main>
 </div>
+<footer class="blog-footer">
+  <p>Website built on <a href="https://getbootstrap.com/">Bootstrap</a>
+  <p>
+    <a href="#">Back to top</a>
+  </p>
+</footer>
 </body>
 <script>
       function mySubmit(obj) {
