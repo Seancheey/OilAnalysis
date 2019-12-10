@@ -219,7 +219,7 @@
     <div class="col-md-6 px-0">
       <h1 class="display-4 font-italic">{{ news[i].title }}</h1>
       <p class="lead my-3">{{news[i].content[:60]}} ... </p>
-      <p class="lead mb-0"><a href={{ url_for('news_display', news_id=i) }} class="text-white font-weight-bold">Continue reading... ></a></p>
+      <p class="lead mb-0"><a href="{{ url_for('news_display', news_id=news[i].news_id) }}" class="text-white font-weight-bold">Continue reading... ></a></p>
     </div>
   </div>
 
@@ -233,9 +233,9 @@
           </h3>
           <div class="mb-1 text-muted">{{news[i+1].publish_date}}</div>
 <!--          <p class="card-text mb-auto">{{news[i+1].content[:30]}} ...</p>-->
-          <a href={{ url_for('news_display', news_id=i+1) }} >Continue reading</a>
+          <a href="{{ url_for('news_display', news_id=news[i+1].news_id) }}" >Continue reading</a>
         </div>
-        <svg class="bd-placeholder-img card-img-right flex-auto d-none d-lg-block" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><image href="../static/img/news/{{i+1}}.jpg" preserveAspectRatio="xMidYMid slice" x="0" y="0" width="200" height="250"> <rect fill="#55595c" width="100%" height="100%"/><text fill="#eceeef" dy=".3em" x="50%" y="50%">Thumbnail</text></svg>
+        <svg class="bd-placeholder-img card-img-right flex-auto d-none d-lg-block" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><image href="../static/img/news/{{i+1}}.jpg" preserveAspectRatio="xMidYMid slice" x="0" y="0" width="200" height="250"> </image></svg>
       </div>
     </div>
     <div class="col-md-6">
@@ -247,9 +247,9 @@
           </h3>
           <div class="mb-1 text-muted">{{news[i+2].publish_date}}</div>
 <!--          <p class="card-text mb-auto">{{news[i+2].content[:30]}} ...</p>-->
-          <a href={{ url_for('news_display', news_id=i+2) }}>Continue reading</a>
+          <a href="{{ url_for('news_display', news_id=news[i+2].news_id) }}">Continue reading</a>
         </div>
-        <svg class="bd-placeholder-img card-img-right flex-auto d-none d-lg-block" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><image href="../static/img/news/{{i+2}}.jpg" preserveAspectRatio="xMidYMid slice" x="0" y="0" width="200" height="250"> <rect fill="#55595c" width="100%" height="100%"/><text fill="#eceeef" dy=".3em" x="50%" y="50%">Thumbnail</text></svg>
+        <svg class="bd-placeholder-img card-img-right flex-auto d-none d-lg-block" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><image href="../static/img/news/{{i+2}}.jpg" preserveAspectRatio="xMidYMid slice" x="0" y="0" width="200" height="250"></image></svg>
       </div>
     </div>
   </div>

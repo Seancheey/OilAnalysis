@@ -118,7 +118,7 @@ def logout_handler():
 @app.route('/news/<int:news_id>')
 def news_display(news_id):
     try:
-        this_news = news[news_id]
+        this_news = get_one_oil_news(news_id)
     except TypeError:
         return redirect('/')
 
@@ -127,9 +127,15 @@ def news_display(news_id):
     except KeyError:
         # User is not logged in
         username = None
+
+    try:
+        recom = random.sample(news[news_id:] + news[:news_id-1], 3)
+    except TypeError:
+        return redirect('/')
+
     return render_template('news.html', username=username, title=this_news.title,
                            author=this_news.author, data=this_news.publish_date,
-                           content=this_news.content)
+                           content=this_news.content, ref=this_news.reference, recommendation=recom)
 
 
 if __name__ == "__main__":
