@@ -205,12 +205,16 @@
       </div>
       <div class="blog-pagination">
         <h3 class="blog-post"> Comments in Community</h3>
-        <a class="btn btn-outline-secondary disabled" >This is a comment 1</a>
-        <a class="btn btn-outline-primary disabled" >This is a comment 2</a>
-        <a class="btn btn-outline-danger disabled" >This is a comment 3</a>
+        {% if comments %}
+        {% for i in range(comments|length) %}
+        <a class="btn btn-outline-{{['primary', 'secondary', 'danger'][i%3]}} disabled" >{{comments[i]['text']}}</a>
+        {% endfor %}
+        {% else %}
+        <a class="btn btn-outline-primary disabled" >No comment</a>
+        {% endif %}
       </div>
         <div class="blog-post">
-          <form action="{{ url_for('submit_comment') }}" method="post">
+          <form action="{{ url_for('submit_comment', news_id=this_id) }}" method="post">
             <label for="comment" class="blog-post-title">Leave yours here</label>
             {% if username %}
             <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
@@ -280,7 +284,4 @@
         pwdObj.value = hash;
       }
 </script>
-<script type="text/javascript" src="../static/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="../static/mdb.min.js"></script>
-      <script>window.jQuery || document.write('<script src="jquery-slim-3.3.1.min.js"><\/script>')</script><script src="../static/bootstrap.bundle.min.js" integrity="sha384-zDnhMsjVZfS3hiP7oCBRmfjkQC4fzxVxFhBx8Hkz2aZX8gEvA/jsP3eXRCvzTofP" crossorigin="anonymous"></script></body>
 </html>

@@ -133,16 +133,18 @@ def news_display(news_id):
     except TypeError:
         return redirect('/')
 
-    return render_template('news.html', username=username, title=this_news.title,
+    comments = api.get_comments_for_news(news_id)
+    return render_template('news.html', this_id=this_news.news_id, username=username, title=this_news.title,
                            author=this_news.author, data=this_news.publish_date,
-                           content=this_news.content, ref=this_news.reference, recommendation=recom)
+                           content=this_news.content, ref=this_news.reference, recommendation=recom, comments=comments)
 
 
-@app.route('/news/comments', methods=['POST'])
-def submit_comment():
+@app.route('/news/<int:news_id>/comment', methods=['POST'])
+def submit_comment(news_id):
     form = request.form
     comment = form['comment']
-
+    api.comment(session['token'], news_id, comment, NewsComment)
+    return redirect('/news/' + str(news_id))
 
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
