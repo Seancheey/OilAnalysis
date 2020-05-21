@@ -19,7 +19,7 @@ def get_oil_news_list(start_time: datetime = None, end_time: datetime = None, ne
     :return: list of oil news objects
     """
     with new_session() as session:
-        result = session.query(OilNews).order_by(OilNews.publish_date)
+        result = session.query(OilNews).order_by(OilNews.publish_date.desc())
         if start_time:
             result = result.filter(OilNews.publish_date > start_time)
         if end_time:
